@@ -12,11 +12,13 @@ public class OwnerFrame extends JFrame{
     private static final int FRAME_WIDTH = 1280;
     private static final int FRAME_HEIGHT = 720;
 
+
     private JButton button;
 
 
     public OwnerFrame(){
 
+        super("Owner View");
         registrationButton();
         createPanel();
 
@@ -25,7 +27,7 @@ public class OwnerFrame extends JFrame{
 
     class AddRegistrationListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
-
+            new RegistrationFrame().setVisible(true);
         }
     }
 
@@ -45,4 +47,63 @@ public class OwnerFrame extends JFrame{
     }
 }
 
+class RegistrationFrame extends JFrame{
+    private static final int FRAME_WIDTH = 700;
+    private static final int FRAME_HEIGHT = 550;
+
+    // vehicle attr
+    private JTextField ownerIdField;
+    private JTextField vehicleManufacturer;
+    private JTextField vehicleModel;
+    private JTextField vehicleYear;
+    private JTextField compPow;
+
+    private JButton submitButton;
+
+    public RegistrationFrame(){
+        super("Register Vehicle");
+        createTextFields();
+        createPanel();
+        createButton();
+        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+    private void createTextFields(){
+        ownerIdField = new JTextField(20);
+        vehicleManufacturer = new JTextField(20);
+        vehicleModel = new JTextField(20);
+        vehicleYear = new JTextField(20);
+        compPow = new JTextField(20);
+    }
+
+    private void createButton(){
+        submitButton = new JButton();
+        submitButton.addActionListener(new SubmitListener());
+
+    }
+    private void createPanel(){
+        JPanel panel = new JPanel();
+
+        panel.add(new JLabel("Owner ID:"));
+        panel.add(ownerIdField);
+        panel.add(new JLabel("Vehicle Manufacturer:"));
+        panel.add(vehicleManufacturer);
+        panel.add(new JLabel("Vehicle Model:"));
+        panel.add(vehicleModel);
+        panel.add(new JLabel("Vehicle Year:"));
+        panel.add(vehicleYear);
+        panel.add(new JLabel("Vehicle Computation Power:"));
+        panel.add(compPow);
+        add(panel);
+    }
+    class SubmitListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            String ownerId = ownerIdField.getText();
+            String vehicleManu = vehicleManufacturer.getText();
+            // rest of attr
+
+        }
+    }
+
+}
 

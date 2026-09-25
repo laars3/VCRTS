@@ -9,6 +9,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class StartFrame extends JFrame{
-    /** TODO: This will be the entry frame for the gui, where the user will select who he is (job owner / vehicle owner)
+    /* TODO: This will be the entry frame for the gui, where the user will select who he is (job owner / vehicle owner)
     and the correct frame will open based on their decision. */
 }
