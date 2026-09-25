@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import storage.TransactionLog;
 
 public class OwnerFrame extends JFrame{
     private static final int FRAME_WIDTH = 1280;
@@ -113,8 +114,9 @@ class RegistrationFrame extends JFrame{
             String vModel = vehicleModelField.getText();
             String vYear = vehicleYearField.getText();
             String vComp = compPowField.getText();
-            System.out.println(ownerId + ", " + vManufacturer + ", " + vModel + ", " + vYear + ", " + vComp);
-
+            String residency = residencyField.getText();
+            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + vYear + ", " + "Vehicle Computation Power" + vComp + "Vehicle Residency: " + residency);
+            RegistrationFrame.this.dispose();
         }
     }
 
