@@ -63,8 +63,8 @@ class RegistrationFrame extends JFrame{
     public RegistrationFrame(){
         super("Register Vehicle");
         createTextFields();
-        createPanel();
         createButton();
+        createPanel();
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
@@ -77,12 +77,13 @@ class RegistrationFrame extends JFrame{
     }
 
     private void createButton(){
-        submitButton = new JButton();
+        submitButton = new JButton("Submit");
         submitButton.addActionListener(new SubmitListener());
 
     }
     private void createPanel(){
         JPanel panel = new JPanel();
+
 
         panel.add(new JLabel("Owner ID:"));
         panel.add(ownerIdField);
@@ -94,6 +95,9 @@ class RegistrationFrame extends JFrame{
         panel.add(vehicleYear);
         panel.add(new JLabel("Vehicle Computation Power:"));
         panel.add(compPow);
+
+        panel.add(submitButton);
+
         add(panel);
     }
     class SubmitListener implements ActionListener{
