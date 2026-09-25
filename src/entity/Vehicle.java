@@ -6,6 +6,7 @@ public class Vehicle{
     private String model;
     private int year;
     private String licensePlate;
+    private float computationPower;
 
     public Vehicle(String make, String model, int year, String licensePlate){
         this.make = make;
