@@ -3,9 +3,9 @@ import javax.swing.JFrame;
 
 public class Main{
     public static void main(String[] args){
-        JFrame frame = new StartFrame();
+        JFrame owner = new StartFrame();
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        owner.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        owner.setVisible(true);
     }
 }

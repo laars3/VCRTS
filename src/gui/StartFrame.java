@@ -16,11 +16,13 @@ public class StartFrame extends JFrame{
     private JButton clientButton;
 
     private OwnerFrame ownerFrame;
+    private ClientFrame clientFrame;
 
     public StartFrame(){
 
         super("VCRTS");
         ownerButton();
+        clientButton();
         createPanel();
 
         setSize(FRAME_WIDTH,FRAME_HEIGHT);
@@ -42,13 +44,30 @@ public class StartFrame extends JFrame{
 
         ActionListener listener = new OwnerListener();
         ownerButton.addActionListener(listener);
+    }
 
+    private void clientButton(){
+        clientButton = new JButton("Job Owner");
+
+        ActionListener listener = new ClientListener();
+        clientButton.addActionListener(listener);
+    }
+
+    class ClientListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            if (clientFrame == null || !clientFrame.isDisplayable()){
+                clientFrame = new ClientFrame();
+            }
+            clientFrame.setVisible(true);
+            clientFrame.toFront();
+        }
     }
 
     private void createPanel(){
         JPanel panel = new JPanel();
 
         panel.add(ownerButton);
+        panel.add(clientButton);
 
         add(panel);
     }
