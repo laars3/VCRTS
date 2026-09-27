@@ -115,7 +115,7 @@ class RegistrationFrame extends JFrame{
             String vYear = vehicleYearField.getText();
             String vComp = compPowField.getText();
             String residency = residencyField.getText();
-            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + vYear + ", " + "Vehicle Computation Power" + vComp + "Vehicle Residency: " + residency);
+            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + vYear + ", " + "Vehicle Computation Power: " + vComp + ", " + "Vehicle Residency: " + residency);
             RegistrationFrame.this.dispose();
         }
     }
