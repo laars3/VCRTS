@@ -1,12 +1,10 @@
 package gui;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+
 import storage.TransactionLog;
 
 public class OwnerFrame extends JFrame{
@@ -70,7 +68,7 @@ class RegistrationFrame extends JFrame{
         createTextFields();
         createButton();
         createPanel();
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        pack();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     private void createTextFields(){
@@ -88,24 +86,30 @@ class RegistrationFrame extends JFrame{
 
     }
     private void createPanel(){
-        JPanel panel = new JPanel();
 
-        panel.add(new JLabel("Owner ID:"));
-        panel.add(ownerIdField);
-        panel.add(new JLabel("Vehicle Manufacturer:"));
-        panel.add(vehicleManufacturerField);
-        panel.add(new JLabel("Vehicle Model:"));
-        panel.add(vehicleModelField);
-        panel.add(new JLabel("Vehicle Year:"));
-        panel.add(vehicleYearField);
-        panel.add(new JLabel("Vehicle Computation Power:"));
-        panel.add(compPowField);
-        panel.add(new JLabel("Residency"));
-        panel.add(residencyField);
+        JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
+        formPanel.add(new JLabel("Owner ID:"));
+        formPanel.add(ownerIdField);
+        formPanel.add(new JLabel("Vehicle Manufacturer:"));
+        formPanel.add(vehicleManufacturerField);
+        formPanel.add(new JLabel("Vehicle Model:"));
+        formPanel.add(vehicleModelField);
+        formPanel.add(new JLabel("Vehicle Year:"));
+        formPanel.add(vehicleYearField);
+        formPanel.add(new JLabel("Vehicle Computation Power:"));
+        formPanel.add(compPowField);
+        formPanel.add(new JLabel("Residency (hours):"));
+        formPanel.add(residencyField);
 
-        panel.add(submitButton);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(submitButton);
 
-        add(panel);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        mainPanel.add(formPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(mainPanel);
     }
     class SubmitListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
