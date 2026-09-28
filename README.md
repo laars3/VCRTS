@@ -19,7 +19,8 @@ Entity
 3. Store vehicles and jobs in objects 
 
 GUI
-1. Overall improvements
-2. Reduce Logic in GUI classes to increase speed
-3. Input Validation
-4. Testing needed to check Owner/Client
+1. Implement Timestamp for when Info is added (Client/Job)
+2. Overall improvements
+3. Reduce Logic in GUI classes to increase speed
+4. Input Validation
+5. Testing needed to check Owner/Client
