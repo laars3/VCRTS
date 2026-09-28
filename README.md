@@ -1,13 +1,13 @@
 Remaining Tasks
 
-HIGHEST PRIORITY 
+*HIGHEST PRIORITY - Entity*
 
 Entity
 1. Add users for all classes
 2. Improve vehicle entity
 3. Store vehicles and jobs in objects 
 
-2ND HIGHEST PRIORITY 
+*2ND HIGHEST PRIORITY - GUI*
 
 GUI
 1. Implement Timestamp for when Info is added (Client/Job)
@@ -16,7 +16,7 @@ GUI
 4. Input Validation
 5. Testing needed to check Owner/Client
 
-3RD HIGHEST PRIORITY 
+*3RD HIGHEST PRIORITY - Client*
 
 Client 
 1. Create Login Page 
@@ -25,7 +25,7 @@ Client
 4. Allow Clients to choose or manage jobs they want to execute
 5. Continue Testing Client functionality
 
-LOWEST PRIORITY
+*LOWEST PRIORITY - Owner*
 
 Owner
 1. Create Owner Login
