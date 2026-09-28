@@ -2,24 +2,24 @@ Remaining Tasks
 
 
 Client 
-Create Login Page 
-Create User Accounts creation
-Tie Jobs to Specific Vehicle Owners
-Allow Clients to choose or manage jobs they want to execute
-Continue Testing Client functionality
+1. Create Login Page 
+2. Create User Accounts creation
+3. Tie Jobs to Specific Vehicle Owners
+4.Allow Clients to choose or manage jobs they want to execute
+5. Continue Testing Client functionality
 
 Owner
-Create Owner Login
-Create Owner Account creation
-Tie owner vehicles to jobs
+1. Create Owner Login
+2. Create Owner Account creation
+3. Tie owner vehicles to jobs
 
 Entity
-Add users for all classes
-Improve vehicle entity
-Store vehicles and jobs in objects 
+1. Add users for all classes
+2. Improve vehicle entity
+3. Store vehicles and jobs in objects 
 
 GUI
-Overall improvements
-Reduce Logic in GUI classes to increase speed
-Input Validation
-Testing needed to check Owner/Client
+1. Overall improvements
+2. Reduce Logic in GUI classes to increase speed
+3. Input Validation
+4. Testing needed to check Owner/Client
