@@ -5,7 +5,7 @@ Client
 1. Create Login Page 
 2. Create User Accounts creation
 3. Tie Jobs to Specific Vehicle Owners
-4.Allow Clients to choose or manage jobs they want to execute
+4. Allow Clients to choose or manage jobs they want to execute
 5. Continue Testing Client functionality
 
 Owner
