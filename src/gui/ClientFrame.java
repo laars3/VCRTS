@@ -3,9 +3,15 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import javax.swing.*;
 
+import entity.Job;
+import entity.JobOwner;
+import storage.JobStore;
 import storage.TransactionLog;
+import storage.UserStore;
 
 public class ClientFrame extends JFrame {
 
@@ -127,21 +133,54 @@ class JobSubmissionFrame extends JFrame {
     }
 
 
+    // On submit: builds a Job from the form, links it to its JobOwner, saves both to the stores, and logs it.
     class SubmitListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
 
             String clientId = clientIdField.getText();
             String jobId = jobIdField.getText();
-            String jobDuration = jobDurationField.getText();
-            String jobDeadline = jobDeadlineField.getText();
+            String jobDurationText = jobDurationField.getText();
+            String jobDeadlineText = jobDeadlineField.getText();
 
-            TransactionLog.append(
-                    "Client: " + clientId +
-                    ", Job ID: " + jobId +
-                    ", Job Duration: " + jobDuration +
-                    ", Job Deadline: " + jobDeadline
-            );
+            try {
+                int durationHours = Integer.parseInt(jobDurationText.trim());
+                int durationMinutes = durationHours * 60;
+
+                LocalDateTime deadline = null;
+                if (jobDeadlineText != null && !jobDeadlineText.isBlank()) {
+                    // Expected format for now: yyyy-MM-ddTHH:mm
+                    // (form will need a real date picker later per spec #11)
+                    deadline = LocalDateTime.parse(jobDeadlineText.trim());
+                }
+
+                // Reuse the job owner's account if we've already seen this clientId, else create one.
+                JobOwner owner = (JobOwner) UserStore.get(clientId);
+                if (owner == null) {
+                    owner = new JobOwner(clientId, "", "");
+                    UserStore.add(owner);
+                }
+
+                // jobType and inputFilePath aren't collected by this form yet (spec #11),
+                // so they're left null until that part of the form is built.
+                Job job = new Job(clientId, jobId, null, durationMinutes, deadline, null);
+
+                JobStore.add(job);
+                owner.addJobId(jobId);
+
+                TransactionLog.append(
+                        "Client: " + clientId +
+                        ", Job ID: " + jobId +
+                        ", Job Duration: " + durationHours + "h" +
+                        ", Job Deadline: " + jobDeadlineText
+                );
+
+            } catch (DateTimeParseException | IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(JobSubmissionFrame.this,
+                        "Invalid input: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             JobSubmissionFrame.this.dispose();
         }

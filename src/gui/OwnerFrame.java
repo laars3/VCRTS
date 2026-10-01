@@ -3,9 +3,14 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
 import javax.swing.*;
 
+import entity.Vehicle;
+import entity.VehicleOwner;
 import storage.TransactionLog;
+import storage.UserStore;
+import storage.VehicleStore;
 
 public class OwnerFrame extends JFrame{
     private static final int FRAME_WIDTH = 1280;
@@ -111,15 +116,49 @@ class RegistrationFrame extends JFrame{
 
         add(mainPanel);
     }
+    // On submit: builds a Vehicle from the form, links it to its VehicleOwner, saves both to the stores, and logs it.
     class SubmitListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             String ownerId = ownerIdField.getText();
             String vManufacturer = vehicleManufacturerField.getText();
             String vModel = vehicleModelField.getText();
-            String vYear = vehicleYearField.getText();
-            String vComp = compPowField.getText();
-            String residency = residencyField.getText();
-            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + vYear + ", " + "Vehicle Computation Power: " + vComp + ", " + "Vehicle Residency: " + residency);
+            String vYearText = vehicleYearField.getText();
+            String vCompText = compPowField.getText();
+            String residencyText = residencyField.getText();
+
+            try {
+                int vYear = Integer.parseInt(vYearText.trim());
+                double vComp = Double.parseDouble(vCompText.trim());
+                int residencyHours = Integer.parseInt(residencyText.trim());
+
+                // Reuse the owner's account if we've already seen this ownerId, else create one.
+                VehicleOwner owner = (VehicleOwner) UserStore.get(ownerId);
+                if (owner == null) {
+                    owner = new VehicleOwner(ownerId, "", "");
+                    UserStore.add(owner);
+                }
+
+                // Form doesn't collect a vehicleId yet, so we derive one.
+                String vehicleId = ownerId + "-" + vManufacturer + "-" + vModel + "-" + vYear;
+
+                LocalDateTime arrival = LocalDateTime.now();
+                LocalDateTime departure = arrival.plusHours(residencyHours);
+
+                Vehicle vehicle = new Vehicle(ownerId, vehicleId, vManufacturer, vModel, vYear,
+                        arrival, departure, vComp);
+
+                VehicleStore.add(vehicle);
+                owner.addVehicleId(vehicleId);
+
+                TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + vYear + ", " + "Vehicle Computation Power: " + vComp + ", " + "Vehicle Residency: " + residencyHours + "h" + ", Vehicle ID: " + vehicleId);
+
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(RegistrationFrame.this,
+                        "Invalid input: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             RegistrationFrame.this.dispose();
         }
     }
