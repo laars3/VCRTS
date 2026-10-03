@@ -4,7 +4,7 @@ import storage.UserStore;
 
 public class Main{
     public static void main(String[] args){
-        // Keep one user store while the app is open.
+        // one user store shared by every frame
         UserStore userStore = new UserStore();
         JFrame login = new StartFrame(userStore);
 

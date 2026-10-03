@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -74,7 +75,7 @@ public class CreateAccountFrame extends JFrame {
         mainPanel.add(form, BorderLayout.CENTER);
 
         JPanel actions = new JPanel();
-        RoundedButton createButton = new RoundedButton("Create Account");
+        JButton createButton = new JButton("Create Account");
         createButton.addActionListener(new CreateListener());
         actions.add(createButton);
         mainPanel.add(actions, BorderLayout.SOUTH);
