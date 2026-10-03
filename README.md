@@ -14,3 +14,4 @@ GUI
 6) Show already registered vehicles in the OwnerFrame (OwnerView, before you press register vehicle)
 7) Types of jobs currently accepting
 8) JOB status 
+9) Introduction frame explaining what it does
