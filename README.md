@@ -2,8 +2,6 @@
 
 ## 09/30/26 WHAT TO DO ##
 
-*Highest Priority*
-
 GUI
 
 1) Making sure the log-in page is correctly wired up from Roni's branch

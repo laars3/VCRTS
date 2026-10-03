@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -86,12 +87,28 @@ public class StartFrame extends JFrame{
     }
 
     private void createPanel(){
-        JPanel panel = new JPanel();
+        JLabel title = new JLabel("VCRTS");
+        title.setFont(new Font("Arial", Font.BOLD, 22));
 
-        panel.add(ownerButton);
-        panel.add(clientButton);
-        panel.add(createAccountButton);
-        add(panel);
+        JLabel intro = new JLabel("<html><body style='width: 260px'>" + "Vehicular Cloud Real Time System. Vehicle owners rent out their car's computing power, and job owners submit jobs to run on it." + "</body></html>");
+
+        JPanel introPanel = new JPanel(new BorderLayout(0, 6));
+        introPanel.add(title, BorderLayout.NORTH);
+        introPanel.add(intro, BorderLayout.CENTER);
+
+        introPanel.add(new JSeparator(), BorderLayout.SOUTH);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(ownerButton);
+        buttonPanel.add(clientButton);
+        buttonPanel.add(createAccountButton);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(0, 14));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(18, 20, 18, 20));
+        mainPanel.add(introPanel, BorderLayout.NORTH);
+        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        add(mainPanel);
     }
 
 }
