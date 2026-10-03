@@ -4,21 +4,30 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+import storage.UserStore;
+
 public class StartFrame extends JFrame{
     private static final int FRAME_WIDTH = 600;
     private static final int FRAME_HEIGHT = 400;
 
     private JButton ownerButton;
     private JButton clientButton;
+    private JButton createAccountButton;
 
     private OwnerFrame ownerFrame;
     private ClientFrame clientFrame;
+    private CreateAccountFrame createAccountFrame;
 
-    public StartFrame(){
+    // shared with every frame that needs accounts
+    private UserStore userStore;
+
+    public StartFrame(UserStore userStore){
 
         super("VCRTS");
+        this.userStore = userStore;
         ownerButton();
         clientButton();
+        createAccountButton();
         createPanel();
 
         setSize(FRAME_WIDTH,FRAME_HEIGHT);
@@ -59,11 +68,29 @@ public class StartFrame extends JFrame{
         }
     }
 
+    private void createAccountButton(){
+        createAccountButton = new JButton("Create Account");
+
+        ActionListener listener = new CreateAccountListener();
+        createAccountButton.addActionListener(listener);
+    }
+
+    class CreateAccountListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            if (createAccountFrame == null || !createAccountFrame.isDisplayable()){
+                createAccountFrame = new CreateAccountFrame(userStore);
+            }
+            createAccountFrame.setVisible(true);
+            createAccountFrame.toFront();
+        }
+    }
+
     private void createPanel(){
         JPanel panel = new JPanel();
 
         panel.add(ownerButton);
         panel.add(clientButton);
+        panel.add(createAccountButton);
         add(panel);
     }
 

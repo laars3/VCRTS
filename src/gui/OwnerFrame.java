@@ -26,7 +26,8 @@ public class OwnerFrame extends JFrame{
 
     class AddRegistrationListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
-            if (registrationFrame == null || !registrationFrame.isDisplayable()){ // so many separate windows don't open, it checks if one was already opened and sets it to visible
+            // reuse the open window instead of spawning new ones
+            if (registrationFrame == null || !registrationFrame.isDisplayable()){
                 registrationFrame = new RegistrationFrame();
             }
             registrationFrame.setVisible(true);
@@ -50,10 +51,7 @@ public class OwnerFrame extends JFrame{
 }
 
 class RegistrationFrame extends JFrame{
-    private static final int FRAME_WIDTH = 700;
-    private static final int FRAME_HEIGHT = 550;
 
-    // vehicle attr
     private JTextField ownerIdField;
     private JTextField vehicleManufacturerField;
     private JTextField vehicleModelField;

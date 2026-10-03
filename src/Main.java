@@ -1,11 +1,14 @@
 import gui.*;
 import javax.swing.JFrame;
+import storage.UserStore;
 
 public class Main{
     public static void main(String[] args){
-        JFrame owner = new StartFrame();
+        // one user store shared by every frame
+        UserStore userStore = new UserStore();
+        JFrame login = new StartFrame(userStore);
 
-        owner.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        owner.setVisible(true);
+        login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        login.setVisible(true);
     }
 }
