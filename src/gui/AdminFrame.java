@@ -16,7 +16,7 @@ public class AdminFrame extends JFrame{
     private static final int FRAME_HEIGHT = 540;
 
     // log keys in the order they show up as columns
-    private static final String[] JOB_KEYS = {"Time", "Client", "Job ID", "Job Duration", "Job Deadline"};
+    private static final String[] JOB_KEYS = {"Time", "Client", "Job ID", "Job Type", "Job Duration", "Job Deadline"};
     private static final String[] VEHICLE_KEYS = {"Time", "Owner", "Vehicle Manufacturer", "Vehicle Model", "Vehicle Year", "Vehicle Computation Power", "Vehicle Residency"};
 
     private JButton ownerViewButton;

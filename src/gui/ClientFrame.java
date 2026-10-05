@@ -156,7 +156,7 @@ class JobSubmissionFrame extends JFrame {
             String jobDeadline = jobDeadlineField.getText();
 
             // 2. Save it to the transaction log file
-            TransactionLog.append("Client: " + clientId + ", Job ID: " + jobId + ", Type: " + jobType + ", Duration: " + jobDuration + ", Deadline: " + jobDeadline);
+            TransactionLog.append("Client: " + clientId + ", Job ID: " + jobId + ", Job Type: " + jobType + ", Job Duration: " + jobDuration + ", Job Deadline: " + jobDeadline);
 
             // 3. Package the new data into a row and instantly send it back to the main dashboard
             mainTableModel.addRow(new Object[]{clientId, jobId, jobType, jobDuration, jobDeadline, "Pending ⏳"});
