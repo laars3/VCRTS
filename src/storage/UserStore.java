@@ -13,9 +13,9 @@ public class UserStore {
         users = new ArrayList<User>();
 
         // These accounts are handy for testing.
-        users.add(new User("owner1", "password", "VEHICLE_OWNER"));
-        users.add(new User("jobowner1", "password", "JOB_OWNER"));
-        users.add(new User("admin", "password", "VCC"));
+        users.add(new User("vowner", "1", "VEHICLE_OWNER"));
+        users.add(new User("job", "1", "JOB_OWNER"));
+        users.add(new User("admin", "admin", "VCC"));
     }
 
     // Adds an account to this run of the app.

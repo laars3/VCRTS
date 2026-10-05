@@ -5,3 +5,5 @@ out/
 tLog.txt
 
 *.iml
+
+.DS_Store
