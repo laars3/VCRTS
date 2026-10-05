@@ -18,6 +18,7 @@ public class StartFrame extends JFrame{
 
     private OwnerFrame ownerFrame;
     private ClientFrame clientFrame;
+    private AdminFrame adminFrame;
     private CreateAccountFrame createAccountFrame;
 
     // shared with every frame that needs accounts
@@ -62,23 +63,43 @@ public class StartFrame extends JFrame{
 
             // role decides which view opens
             if (user.getRole().equals("VEHICLE_OWNER")){
-                if (ownerFrame == null || !ownerFrame.isDisplayable()){
-                    ownerFrame = new OwnerFrame();
-                }
-                ownerFrame.setVisible(true);
-                ownerFrame.toFront();
+                openOwnerFrame();
             }
             else if (user.getRole().equals("JOB_OWNER")){
-                if (clientFrame == null || !clientFrame.isDisplayable()){
-                    clientFrame = new ClientFrame();
-                }
-                clientFrame.setVisible(true);
-                clientFrame.toFront();
+                openClientFrame();
+            }
+            else if (user.getRole().equals("VCC")){
+                openAdminFrame();
             }
             else{
                 JOptionPane.showMessageDialog(StartFrame.this, "No view for this account yet");
             }
         }
+    }
+
+    // reuses the open frame so owners and the admin share one vehicle table
+    void openOwnerFrame(){
+        if (ownerFrame == null || !ownerFrame.isDisplayable()){
+            ownerFrame = new OwnerFrame();
+        }
+        ownerFrame.setVisible(true);
+        ownerFrame.toFront();
+    }
+
+    void openClientFrame(){
+        if (clientFrame == null || !clientFrame.isDisplayable()){
+            clientFrame = new ClientFrame();
+        }
+        clientFrame.setVisible(true);
+        clientFrame.toFront();
+    }
+
+    private void openAdminFrame(){
+        if (adminFrame == null || !adminFrame.isDisplayable()){
+            adminFrame = new AdminFrame(this);
+        }
+        adminFrame.setVisible(true);
+        adminFrame.toFront();
     }
 
     private void createAccountButton(){
