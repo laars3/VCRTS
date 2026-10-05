@@ -1,126 +1,56 @@
+/*
+ * Author: Anthony
+ * Prev Author: Lars
+ * README Task #9: Owner Frame Introductions
+ * Problem Addressed: The Owner window lacked structural UI elements and direction. Added an introductory header to explain that this page is for registering vehicles to rent out computation power.
+ * Java Components Implemented: BorderLayout (for organizing the screen), JLabel (for the text), Font & SwingConstants (for styling and centering).
+ */
+
+
 package gui;
 
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
-import storage.TransactionLog;
-
-public class OwnerFrame extends JFrame{
-    private static final int FRAME_WIDTH = 1280;
-    private static final int FRAME_HEIGHT = 720;
-
-
+public class OwnerFrame extends JFrame {
     private JButton button;
     private RegistrationFrame registrationFrame;
 
-
-    public OwnerFrame(){
-
+    public OwnerFrame() {
         super("Owner View");
-        registrationButton();
-        createPanel();
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        setSize(1280, 720);
+
+        // 1. set the layout rules so we can organize the screen
+        setLayout(new BorderLayout());
+
+        // 2. create the introduction text for the car owner
+        JLabel introLabel = new JLabel("<html><div style='text-align: center;'>Hey Owner! Welcome to our VCRTS app.<br>Here, you can register your vehicle to rent out its computational power.</div></html>", SwingConstants.CENTER);
+        introLabel.setFont(new Font("Arial", Font.BOLD, 24));
+
+        // 3. pin the text to the top of the window
+        add(introLabel, BorderLayout.NORTH);
+
+        // 4. create the registration button
+        button = new JButton("Register Vehicle");
+        button.addActionListener(new AddRegistrationListener());
+
+        // 5. place the button in the center
+        JPanel panel = new JPanel();
+        panel.add(button);
+        add(panel, BorderLayout.CENTER);
     }
 
-    class AddRegistrationListener implements ActionListener{
-        public void actionPerformed(ActionEvent event){
-            // reuse the open window instead of spawning new ones
-            if (registrationFrame == null || !registrationFrame.isDisplayable()){
+    // This class handles the button click event
+    class AddRegistrationListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            // Open the registration window
+            if (registrationFrame == null || !registrationFrame.isDisplayable()) {
                 registrationFrame = new RegistrationFrame();
             }
+            // Show the submission window and bring it to the user's focus
             registrationFrame.setVisible(true);
             registrationFrame.toFront();
         }
     }
-
-    private void registrationButton(){
-
-        button = new JButton("Register Vehicle");
-
-        ActionListener listener = new AddRegistrationListener();
-        button.addActionListener(listener);
-    }
-
-    private void createPanel(){
-        JPanel panel = new JPanel();
-        panel.add(button);
-        add(panel);
-    }
 }
-
-class RegistrationFrame extends JFrame{
-
-    private JTextField ownerIdField;
-    private JTextField vehicleManufacturerField;
-    private JTextField vehicleModelField;
-    private JTextField vehicleYearField;
-    private JTextField compPowField;
-    private JTextField residencyField;
-
-    private JButton submitButton;
-
-    public RegistrationFrame(){
-        super("Register Vehicle");
-        createTextFields();
-        createButton();
-        createPanel();
-        pack();
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    }
-    private void createTextFields(){
-        ownerIdField = new JTextField(20);
-        vehicleManufacturerField = new JTextField(20);
-        vehicleModelField = new JTextField(20);
-        vehicleYearField = new JTextField(20);
-        compPowField = new JTextField(20);
-        residencyField = new JTextField(20);
-    }
-
-    private void createButton(){
-        submitButton = new JButton("Submit");
-        submitButton.addActionListener(new SubmitListener());
-
-    }
-    private void createPanel(){
-
-        JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
-        formPanel.add(new JLabel("Owner ID:"));
-        formPanel.add(ownerIdField);
-        formPanel.add(new JLabel("Vehicle Manufacturer:"));
-        formPanel.add(vehicleManufacturerField);
-        formPanel.add(new JLabel("Vehicle Model:"));
-        formPanel.add(vehicleModelField);
-        formPanel.add(new JLabel("Vehicle Year:"));
-        formPanel.add(vehicleYearField);
-        formPanel.add(new JLabel("Vehicle Computation Power:"));
-        formPanel.add(compPowField);
-        formPanel.add(new JLabel("Residency (hours):"));
-        formPanel.add(residencyField);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(submitButton);
-
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        mainPanel.add(formPanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        add(mainPanel);
-    }
-    class SubmitListener implements ActionListener{
-        public void actionPerformed(ActionEvent event){
-            String ownerId = ownerIdField.getText();
-            String vManufacturer = vehicleManufacturerField.getText();
-            String vModel = vehicleModelField.getText();
-            String vYear = vehicleYearField.getText();
-            String vComp = compPowField.getText();
-            String residency = residencyField.getText();
-            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + vYear + ", " + "Vehicle Computation Power: " + vComp + ", " + "Vehicle Residency: " + residency);
-            RegistrationFrame.this.dispose();
-        }
-    }
-
-}
-
