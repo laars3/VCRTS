@@ -26,15 +26,15 @@ public class StartFrame extends JFrame{
 
     public StartFrame(UserStore userStore){
 
-        super("VCRTS");
+        super("Log In");
         this.userStore = userStore;
         createTextFields();
         loginButton();
         createAccountButton();
         createPanel();
 
-        setLocationRelativeTo(null);
         pack();
+        setLocationRelativeTo(null);
     }
 
     private void createTextFields(){
@@ -121,13 +121,29 @@ public class StartFrame extends JFrame{
 
     private void createPanel(){
         JLabel title = new JLabel("VCRTS");
-        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setFont(new Font("Arial", Font.BOLD, 20));
 
-        JLabel intro = new JLabel("<html><body style='width: 260px'>" + "Vehicular Cloud Real Time System. Vehicle owners rent out their car's computing power, job owners submit computational jobs to be completed ." + "</body></html>");
+        JLabel intro = new JLabel("Parked cars lend their spare computing power to run jobs in the cloud.");
+        intro.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        JLabel ownerInfo = new JLabel("Vehicle owners register their car to share its computing power.");
+        ownerInfo.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        JLabel clientInfo = new JLabel("Job owners submit jobs to run on those cars.");
+        clientInfo.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        JLabel getStarted = new JLabel("Log in or create an account to get started.");
+        getStarted.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        JPanel introText = new JPanel(new GridLayout(0, 1, 0, 2));
+        introText.add(intro);
+        introText.add(ownerInfo);
+        introText.add(clientInfo);
+        introText.add(getStarted);
 
         JPanel introPanel = new JPanel(new BorderLayout(0, 6));
         introPanel.add(title, BorderLayout.NORTH);
-        introPanel.add(intro, BorderLayout.CENTER);
+        introPanel.add(introText, BorderLayout.CENTER);
 
         introPanel.add(new JSeparator(), BorderLayout.SOUTH);
 
