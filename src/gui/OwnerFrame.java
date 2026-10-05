@@ -19,6 +19,10 @@ public class OwnerFrame extends JFrame{
     public OwnerFrame(){
 
         super("Owner View");
+        setSize(1280, 720);
+        setLocationRelativeTo(null);
+        
+        setLayout(new BorderLayout(10, 10));
         registrationButton();
         createTable();
         createPanel();

@@ -20,6 +20,7 @@ public class ClientFrame extends JFrame {
     public ClientFrame() {
         super("Client View");
         setSize(1280, 720);
+        setLocationRelativeTo(null);
 
         setLayout(new BorderLayout());
 
@@ -30,9 +31,11 @@ public class ClientFrame extends JFrame {
         submitJobButton = new JButton("Submit Job");
         submitJobButton.addActionListener(new AddJobListener());
 
-        JPanel panel = new JPanel();
-        panel.add(submitJobButton);
-        add(panel, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
+        buttonPanel.add(submitJobButton);
+
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     class AddJobListener implements ActionListener {
