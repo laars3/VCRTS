@@ -6,13 +6,6 @@ import java.awt.event.*;
 import javax.swing.table.DefaultTableModel;
 import storage.TransactionLog;
 
-/*
- * Author: Anthony
- * Prev Author: Lars
- * README Task #9: Owner Frame Introductions
- * Problem Addressed: The Owner window lacked structural UI elements and direction. Added an introductory header to explain that this page is for registering vehicles to rent out computation power.
- * Java Components Implemented: BorderLayout (for organizing the screen), JLabel (for the text), Font & SwingConstants (for styling and centering).
- */
 public class OwnerFrame extends JFrame {
     private JButton button;
     private RegistrationFrame registrationFrame;
@@ -39,9 +32,16 @@ public class OwnerFrame extends JFrame {
         };
 
         // model lets new rows be added after the table is built
-        tableModel = new DefaultTableModel(dummyData, columnNames);
+        tableModel = new DefaultTableModel(dummyData, columnNames){
+            // read only in the ui, rows still get added through addRow
+            public boolean isCellEditable(int row, int column){
+                return false;
+            }
+        };
         JTable vehicleTable = new JTable(tableModel);
         vehicleTable.setFillsViewportHeight(true);
+        vehicleTable.getTableHeader().setReorderingAllowed(false);
+        vehicleTable.getTableHeader().setResizingAllowed(false);
         JScrollPane scrollPane = new JScrollPane(vehicleTable);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -65,7 +65,6 @@ public class OwnerFrame extends JFrame {
     }
 }
 
-// --- LARS' ORIGINAL POPUP CODE RESTORED ---
 class RegistrationFrame extends JFrame {
     private JTextField ownerIdField;
     private JTextField vehicleManufacturerField;
