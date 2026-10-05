@@ -19,7 +19,8 @@ public class OwnerFrame extends JFrame {
     public OwnerFrame() {
         super("Owner View");
         setSize(1280, 720);
-
+        setLocationRelativeTo(null);
+        
         setLayout(new BorderLayout(10, 10));
 
         JLabel introLabel = new JLabel("<html><div style='text-align: center;'>Hey Owner! Welcome to our VCRTS app.<br>Here, you can register your vehicle to rent out its computational power.</div></html>", SwingConstants.CENTER);
