@@ -61,7 +61,7 @@ public class OwnerFrame extends JFrame {
     }
 }
 
-// --- IAN'S ORIGINAL POPUP CODE RESTORED ---
+// --- LARS' ORIGINAL POPUP CODE RESTORED ---
 class RegistrationFrame extends JFrame {
     private JTextField ownerIdField;
     private JTextField vehicleManufacturerField;
