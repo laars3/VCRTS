@@ -20,6 +20,7 @@ public class ClientFrame extends JFrame {
     public ClientFrame() {
         super("Client View");
         setSize(1280, 720);
+        setLocationRelativeTo(null);
 
         setLayout(new BorderLayout());
 
