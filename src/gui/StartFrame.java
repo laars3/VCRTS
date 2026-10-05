@@ -32,6 +32,7 @@ public class StartFrame extends JFrame{
         createAccountButton();
         createPanel();
 
+        setLocationRelativeTo(null);
         pack();
     }
 
