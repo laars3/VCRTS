@@ -3,6 +3,7 @@ package gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.table.DefaultTableModel;
 import storage.TransactionLog;
 
 /*
@@ -15,6 +16,7 @@ import storage.TransactionLog;
 public class OwnerFrame extends JFrame {
     private JButton button;
     private RegistrationFrame registrationFrame;
+    private DefaultTableModel tableModel;
 
     public OwnerFrame() {
         super("Owner View");
@@ -36,7 +38,9 @@ public class OwnerFrame extends JFrame {
                 {"O-104", "Rivian", "R1T", "2024", "High", "24 hours"}
         };
 
-        JTable vehicleTable = new JTable(dummyData, columnNames);
+        // model lets new rows be added after the table is built
+        tableModel = new DefaultTableModel(dummyData, columnNames);
+        JTable vehicleTable = new JTable(tableModel);
         vehicleTable.setFillsViewportHeight(true);
         JScrollPane scrollPane = new JScrollPane(vehicleTable);
         add(scrollPane, BorderLayout.CENTER);
@@ -53,7 +57,7 @@ public class OwnerFrame extends JFrame {
     class AddRegistrationListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             if (registrationFrame == null || !registrationFrame.isDisplayable()) {
-                registrationFrame = new RegistrationFrame();
+                registrationFrame = new RegistrationFrame(tableModel);
             }
             registrationFrame.setVisible(true);
             registrationFrame.toFront();
@@ -71,8 +75,12 @@ class RegistrationFrame extends JFrame {
     private JTextField residencyField;
     private JButton submitButton;
 
-    public RegistrationFrame() {
+    // the owner view's table, new vehicles get added here
+    private DefaultTableModel tableModel;
+
+    public RegistrationFrame(DefaultTableModel tableModel) {
         super("Register Vehicle");
+        this.tableModel = tableModel;
         this.createTextFields();
         this.createButton();
         this.createPanel();
@@ -127,6 +135,7 @@ class RegistrationFrame extends JFrame {
             String vComp = compPowField.getText();
             String residency = residencyField.getText();
             TransactionLog.append("Owner: " + ownerId + ", Vehicle Manufacturer: " + vManufacturer + ", Vehicle Model: " + vModel + ", Vehicle Year: " + vYear + ", Vehicle Computation Power: " + vComp + ", Vehicle Residency: " + residency);
+            tableModel.addRow(new String[]{ownerId, vManufacturer, vModel, vYear, vComp, residency + " hours"});
             dispose();
         }
     }
