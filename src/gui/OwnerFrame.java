@@ -17,10 +17,17 @@ public class OwnerFrame extends JFrame {
 
         setLayout(new BorderLayout(10, 10));
 
-        JLabel introLabel = new JLabel("<html><div style='text-align: center;'>Hey Owner! Welcome to our VCRTS app.<br>Here, you can register your vehicle to rent out its computational power.</div></html>", SwingConstants.CENTER);
-        introLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        introLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
-        add(introLabel, BorderLayout.NORTH);
+        JLabel title = new JLabel("Your Vehicles");
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+
+        JLabel intro = new JLabel("Register a vehicle to rent out its computing power.");
+        intro.setFont(new Font("Arial", Font.PLAIN, 13));
+
+        JPanel introPanel = new JPanel(new BorderLayout(0, 4));
+        introPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 8, 20));
+        introPanel.add(title, BorderLayout.NORTH);
+        introPanel.add(intro, BorderLayout.CENTER);
+        add(introPanel, BorderLayout.NORTH);
 
         // EXAMPLE - "Dummy Data" Dashboard
         String[] columnNames = {"Owner ID", "Manufacturer", "Model", "Year", "Computation Power", "Residency"};
