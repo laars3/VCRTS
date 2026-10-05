@@ -62,10 +62,10 @@ public class OwnerFrame extends JFrame{
     }
 
     private void createPanel(){
-        JLabel title = new JLabel("Your Vehicles");
+        JLabel title = new JLabel("Available Vehicles");
         title.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JLabel intro = new JLabel("Register a vehicle to rent out its computing power.");
+        JLabel intro = new JLabel("All vehicles currently in the cloud. Register yours below to rent out its computing power.");
         intro.setFont(new Font("Arial", Font.PLAIN, 13));
 
         JPanel introPanel = new JPanel(new BorderLayout(0, 4));
