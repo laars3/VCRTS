@@ -106,6 +106,17 @@ class RegistrationFrame extends JFrame{
 
     private JButton submitButton;
 
+    private static final int OWNER_ID_MIN = 3;
+    private static final int OWNER_ID_MAX = 8;
+    private static final String OWNER_ID_PATTERN = "[A-Za-z0-9_-]+";
+
+    private static final int TEXT_MIN = 2;
+    private static final int TEXT_MAX = 30;
+    private static final String TEXT_PATTERN = "[A-Za-z0-9 .-]+";
+    private static final int YEAR_MIN = 1900;
+    private static final int RESIDENCY_MIN = 1;
+    private static final int RESIDENCY_MAX = 168;
+
     // owner frame's table, new vehicles go here
     private DefaultTableModel tableModel;
 
@@ -160,16 +171,96 @@ class RegistrationFrame extends JFrame{
     }
     class SubmitListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
-            String ownerId = ownerIdField.getText();
-            String vManufacturer = vehicleManufacturerField.getText();
-            String vModel = vehicleModelField.getText();
-            String vYear = vehicleYearField.getText();
-            String vComp = compPowField.getText();
-            String residency = residencyField.getText();
-            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + vYear + ", " + "Vehicle Computation Power: " + vComp + ", " + "Vehicle Residency: " + residency);
-            tableModel.addRow(new String[]{ownerId, vManufacturer, vModel, vYear, vComp, residency + " hours"});
+            String ownerId = ownerIdField.getText().trim();
+            String vManufacturer = vehicleManufacturerField.getText().trim();
+            String vModel = vehicleModelField.getText().trim();
+            String vYear = vehicleYearField.getText().trim();
+            String vComp = compPowField.getText().trim();
+            String residency = residencyField.getText().trim();
+
+
+            if(ownerId.length() < OWNER_ID_MIN || ownerId.length() > OWNER_ID_MAX) {
+                showError("Owner ID length should be between " + OWNER_ID_MIN + " and " + OWNER_ID_MAX);
+                return;
+
+            }
+
+            if(!ownerId.matches(OWNER_ID_PATTERN)) {
+                showError("Owner ID can only use letters, numbers, - and _ (no spaces).");
+                return;
+            }
+
+            // manufacturer
+            if(vManufacturer.length() < TEXT_MIN || vManufacturer.length() > TEXT_MAX) {
+                showError("Manufacturer must be " + TEXT_MIN + " to " + TEXT_MAX + " characters.");
+                return;
+            }
+            if(!vManufacturer.matches(TEXT_PATTERN)) {
+                showError("Manufacturer can only use letters, numbers, spaces, . and -");
+                return;
+            }
+
+            // model
+            if(vModel.length() < TEXT_MIN || vModel.length() > TEXT_MAX) {
+                showError("Model must be " + TEXT_MIN + " to " + TEXT_MAX + " characters.");
+                return;
+            }
+            if(!vModel.matches(TEXT_PATTERN)) {
+                showError("Model can only use letters, numbers, spaces, . and -");
+                return;
+            }
+
+            // year
+            int year;
+            try {
+                year = Integer.parseInt(vYear);
+            } catch(NumberFormatException e) {
+                showError("Year must be a whole number like 2023.");
+                return;
+            }
+            int maxYear = java.time.Year.now().getValue() + 1;
+            if(year < YEAR_MIN || year > maxYear) {
+                showError("Year must be between " + YEAR_MIN + " and " + maxYear + ".");
+                return;
+            }
+
+            // computation power
+            double power;
+            try {
+                power = Double.parseDouble(vComp);
+            } catch(NumberFormatException e) {
+                showError("Computation power must be a number.");
+                return;
+            }
+            if(Double.isNaN(power) || Double.isInfinite(power) || power <= 0) {
+                showError("Computation power must be greater than 0.");
+                return;
+            }
+
+            // residency hours
+            int hours;
+            try {
+                hours = Integer.parseInt(residency);
+            } catch(NumberFormatException e) {
+                showError("Residency must be a whole number of hours.");
+                return;
+            }
+            if(hours < RESIDENCY_MIN || hours > RESIDENCY_MAX) {
+                showError("Residency must be between " + RESIDENCY_MIN + " and " + RESIDENCY_MAX + " hours.");
+                return;
+            }
+
+
+
+            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + year + ", " + "Vehicle Computation Power: " + vComp + ", " + "Vehicle Residency: " + hours);
+            tableModel.addRow(new String[]{ownerId, vManufacturer, vModel, String.valueOf(year), vComp, hours + " hours"});
             RegistrationFrame.this.dispose();
         }
+    }
+
+    private void showError(String message){
+        JOptionPane.showMessageDialog(this, message);
+
     }
 
 }
