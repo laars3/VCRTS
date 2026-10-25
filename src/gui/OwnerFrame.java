@@ -225,6 +225,10 @@ class RegistrationFrame extends JFrame{
             }
 
             // computation power
+            if(!vComp.matches("(0|[1-9][0-9]*)(\\.[0-9]+)?")) {
+                showError("Computation power must be a plain number like 100 or 12.5 (no leading zeros).");
+                return;
+            }
             double power;
             try {
                 power = Double.parseDouble(vComp);
