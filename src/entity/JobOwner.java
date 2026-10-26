@@ -16,7 +16,7 @@ public class JobOwner extends User {
                     String password) {
         super(username, password, "JOB_OWNER");
         this.clientId = clientId;
-
+    }
         
   // Returns the client ID
     public String getClientId() {
