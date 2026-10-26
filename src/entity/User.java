@@ -35,7 +35,7 @@ public class User{
     // Gets the account type.
     public String getRole(){
         return role;
-
+    }
     
     // Returns user ID
     public String getUserId() {
