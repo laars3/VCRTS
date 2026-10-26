@@ -13,6 +13,7 @@ public class OwnerFrame extends JFrame{
     private static final int FRAME_HEIGHT = 720;
 
     private JButton button;
+    private JButton backButton; // 10/25/2026 - anthony - Declares a back button variable
     private RegistrationFrame registrationFrame;
     private DefaultTableModel tableModel;
 
@@ -29,6 +30,17 @@ public class OwnerFrame extends JFrame{
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
     }
 
+    private void registrationButton(){
+        button = new JButton("Register Vehicle");
+
+        ActionListener listener = new AddRegistrationListener();
+        button.addActionListener(listener);
+
+        // 10/25/2026, Anthony - creates and wires back button
+        backButton = new JButton("Back");
+        backButton.addActionListener(new BackListener());
+    }
+
     class AddRegistrationListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             if (registrationFrame == null || !registrationFrame.isDisplayable()){
@@ -39,11 +51,11 @@ public class OwnerFrame extends JFrame{
         }
     }
 
-    private void registrationButton(){
-        button = new JButton("Register Vehicle");
-
-        ActionListener listener = new AddRegistrationListener();
-        button.addActionListener(listener);
+    // 10/25/2026, Anthony - hides the dashboard to reveal the login frame underneath
+    class BackListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            setVisible(false); //hides the OwnerFrame window
+        }
     }
 
     private void createTable(){
@@ -85,6 +97,7 @@ public class OwnerFrame extends JFrame{
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
         buttonPanel.add(button);
+        buttonPanel.add(backButton); // 10/25/2026, Anthony - add back button to the panel
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.add(introPanel, BorderLayout.NORTH);
@@ -105,6 +118,7 @@ class RegistrationFrame extends JFrame{
     private JTextField residencyField;
 
     private JButton submitButton;
+    private JButton backButton; // 10/25/2026, Anthony - Declares a back button variable
 
     private static final int OWNER_ID_MIN = 3;
     private static final int OWNER_ID_MAX = 8;
@@ -141,6 +155,10 @@ class RegistrationFrame extends JFrame{
     private void createButton(){
         submitButton = new JButton("Submit");
         submitButton.addActionListener(new SubmitListener());
+
+        // 10/25/2026, Anthony - creates and wire the back button in createButton()
+        backButton = new JButton("Back");
+        backButton.addActionListener(new BackListener());
     }
 
     private void createPanel(){
@@ -161,6 +179,7 @@ class RegistrationFrame extends JFrame{
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(submitButton);
+        buttonPanel.add(backButton); // 10/25/2026, Anthony - add the back button to the buttonPanel
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -262,9 +281,15 @@ class RegistrationFrame extends JFrame{
         }
     }
 
+class BackListener implements ActionListener {
+        public void actionPerformed (ActionEvent event) {
+            dispose();
+        }
+    }
+
     private void showError(String message){
         JOptionPane.showMessageDialog(this, message);
-
     }
+
 
 }
