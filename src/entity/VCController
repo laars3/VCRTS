@@ -1,0 +1,63 @@
+package entity;
+
+import javautil.Arraylist;
+import javautil.Collections;
+import javautil.List;
+
+/**
+* Controls vechiles and jobs in vehicular cloud
+* inheirits from user account info from User
+*/
+
+public class VVController extends User{
+
+ private String controllerId;
+    private final List<Job> activeJobs = new ArrayList<>();
+    private final List<Job> completedJobs = new ArrayList<>();
+    private final List<Vehicle> vehicles = new ArrayList<>();
+    private Server server;
+
+// Constructor
+    public VCController(String controllerId,
+    String username,
+    String password) {
+    super(username, password, "VCC");
+      this.controllerId = controllerId;
+    }
+
+ // Returns the controller's ID.
+    public String getControllerId() {
+        return controllerId;
+    }
+
+ // Returns active jobs.
+    public List<Job> getActiveJobs() {
+        return Collections.unmodifiableList(activeJobs);
+    }
+
+ // Returns completed jobs.
+    public List<Job> getCompletedJobs() {
+        return Collections.unmodifiableList(completedJobs);
+    }
+
+// Returns vehicles managed by the controller.
+    public List<Vehicle> getVehicles() {
+        return Collections.unmodifiableList(vehicles);
+    }
+
+// assigns the server.
+    public void setServer(Server server){
+    this.server = server;
+    }
+ // TODO: Register a vehicle in the system.
+    public void registerVehicle(Vehicle vehicle) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+ // TODO: Remove a registered vehicle.
+    public void removeVehicle(String vehicleId) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+
+
