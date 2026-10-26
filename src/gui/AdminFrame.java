@@ -22,12 +22,13 @@ public class AdminFrame extends JFrame{
     private JButton ownerViewButton;
     private JButton clientViewButton;
     private JButton refreshButton;
+    private JButton backButton; // 10/25/2026 - anthony - Declares a back button variable
 
     private DefaultTableModel jobTableModel;
     private DefaultTableModel vehicleTableModel;
 
     // start frame keeps the owner and client frames, so admin sees the same ones users do
-    private StartFrame startFrame;
+    private final StartFrame startFrame;
 
     public AdminFrame(StartFrame startFrame){
 
@@ -58,6 +59,10 @@ public class AdminFrame extends JFrame{
 
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(new RefreshListener());
+
+        // 10/25/2026, Anthony - creates and wire back button
+        backButton = new JButton("Back");
+        backButton.addActionListener(new BackListener());
     }
 
     class OwnerViewListener implements ActionListener{
@@ -75,6 +80,15 @@ public class AdminFrame extends JFrame{
     class RefreshListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             loadLog();
+        }
+    }
+
+    //10/25/2026 - anthony
+    class BackListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            setVisible(false); // hides the current admin window w/out deleting it
+            startFrame.setVisible(true); // makes the login screen (StartFrame) visible again
+            startFrame.toFront(); // forces the login screen to jump to the front of user's desktop
         }
     }
 
@@ -153,6 +167,7 @@ public class AdminFrame extends JFrame{
         buttonPanel.add(refreshButton);
         buttonPanel.add(ownerViewButton);
         buttonPanel.add(clientViewButton);
+        buttonPanel.add(backButton); // 10/25/2026 - anthony - add back button to the panel
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(introPanel, BorderLayout.WEST);

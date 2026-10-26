@@ -14,6 +14,7 @@ public class ClientFrame extends JFrame {
     private static final int FRAME_HEIGHT = 720;
 
     private JButton submitJobButton;
+    private JButton backButton; // 10/25/2026 - anthony - Declares a back button variable
     private JobSubmissionFrame jobSubmissionFrame;
     private DefaultTableModel tableModel;
 
@@ -40,12 +41,21 @@ public class ClientFrame extends JFrame {
         }
     }
 
+    // 10/25/2026, Anthony - hides the dashboard to reveal the login frame underneath
+    class BackListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            setVisible(false); //hides the Client Frame window
+        }
+    }
+
     private void submitJobButton() {
-
         submitJobButton = new JButton("Submit Job");
-
         ActionListener listener = new AddJobListener();
         submitJobButton.addActionListener(listener);
+
+        // 10/25/2026, Anthony - creates and wires back button
+        backButton = new JButton("Back");
+        backButton.addActionListener(new BackListener());
     }
 
     private void createTable() {
@@ -86,6 +96,7 @@ public class ClientFrame extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
         buttonPanel.add(submitJobButton);
+        buttonPanel.add(backButton); // 10/25/2026, Anthony - add back button to the panel
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.add(introPanel, BorderLayout.NORTH);
@@ -106,6 +117,7 @@ class JobSubmissionFrame extends JFrame {
     private JTextField jobDeadlineField;
 
     private JButton submitButton;
+    private JButton backButton; // 10/25/2026, Anthony - Declare back button
 
     // client frame's table, new jobs go here
     private DefaultTableModel tableModel;
@@ -138,9 +150,12 @@ class JobSubmissionFrame extends JFrame {
 
     private void createButton() {
 
-        submitButton = new JButton("Submit");
+        this.submitButton = new JButton("Submit");
+        this.submitButton.addActionListener(new SubmitListener());
 
-        submitButton.addActionListener(new SubmitListener());
+        // 10/25/2026, Anthony - creates and wire back button
+        this.backButton = new JButton("Back");
+        this.backButton.addActionListener(new BackListener());
     }
 
     private void createPanel() {
@@ -164,8 +179,8 @@ class JobSubmissionFrame extends JFrame {
 
 
         JPanel buttonPanel = new JPanel();
-
-        buttonPanel.add(submitButton);
+        buttonPanel.add(this.submitButton);
+        buttonPanel.add(this.backButton); // 10/25/2026, Anthony - add the back button to the buttonPanel
 
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -205,4 +220,12 @@ class JobSubmissionFrame extends JFrame {
             JobSubmissionFrame.this.dispose();
         }
     }
+
+    // 10/25/2026, Anthony - creates an action listener that activates when a user presses the back button
+    class BackListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            dispose();
+        }
+    }
+
 }

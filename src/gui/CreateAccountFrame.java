@@ -24,6 +24,7 @@ public class CreateAccountFrame extends JFrame {
     private JPasswordField passwordField;
     private JPasswordField confirmPasswordField;
     private JComboBox<String> accountTypeBox;
+    private JButton backButton; // 10/25/2026, Anthony - declare back button
 
     public CreateAccountFrame(UserStore userStore) {
         super("Create an Account");
@@ -78,8 +79,13 @@ public class CreateAccountFrame extends JFrame {
         JButton createButton = new JButton("Create Account");
         createButton.addActionListener(new CreateListener());
         actions.add(createButton);
-        mainPanel.add(actions, BorderLayout.SOUTH);
 
+        // 10/25/2026 - create and wire back button. add it to the panel.
+        backButton = new JButton("Back");
+        backButton.addActionListener(new BackListener());
+        actions.add(backButton);
+
+        mainPanel.add(actions, BorderLayout.SOUTH);
         add(mainPanel);
     }
 
@@ -131,4 +137,12 @@ public class CreateAccountFrame extends JFrame {
         JOptionPane.showMessageDialog(this, message, "Check Account Details",
                 JOptionPane.ERROR_MESSAGE);
     }
+
+    // 10/25/2026, Anthony - creates an action listener that activates when a user presses the back button
+    class BackListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            dispose();
+        }
+    }
+
 }
