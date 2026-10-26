@@ -58,6 +58,16 @@ public class VVController extends User{
     public void removeVehicle(String vehicleId) {
         throw new UnsupportedOperationException("Not implemented");
     }
+ // TODO: Update a vehicle's availability.
+    public void updateVehicleAvailability(
+            String vehicleId, boolean available) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+ // TODO: Assign a job to a vehicle.
+    public void assignJob(Job job, Vehicle vehicle) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 
 
 
