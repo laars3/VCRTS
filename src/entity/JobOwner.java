@@ -17,3 +17,4 @@ public class JobOwner extends User {
         super(username, password, "JOB_OWNER");
         this.clientId = clientId;
     }
+}

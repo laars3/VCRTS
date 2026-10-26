@@ -1,15 +1,15 @@
 package entity;
 
-import javautil.Arraylist;
-import javautil.Collections;
-import javautil.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
 * Controls vechiles and jobs in vehicular cloud
 * inheirits from user account info from User
 */
 
-public class VVController extends User{
+public class VCController extends User{
 
  private String controllerId;
     private final List<Job> activeJobs = new ArrayList<>();
@@ -19,8 +19,8 @@ public class VVController extends User{
 
 // Constructor
     public VCController(String controllerId,
-    String username,
-    String password) {
+                        String username,
+                        String password) {
     super(username, password, "VCC");
       this.controllerId = controllerId;
     }
