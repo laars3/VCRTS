@@ -1,231 +1,200 @@
 package gui;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import entity.Job;
+import entity.User;
+import storage.JobStore;
 import storage.TransactionLog;
 
 public class ClientFrame extends JFrame {
+    private final User currentUser;
+    private final JobStore jobStore;
+    private final DefaultTableModel tableModel;
 
-    private static final int FRAME_WIDTH = 1280;
-    private static final int FRAME_HEIGHT = 720;
-
-    private JButton submitJobButton;
-    private JButton backButton; // 10/25/2026 - anthony - Declares a back button variable
-    private JobSubmissionFrame jobSubmissionFrame;
-    private DefaultTableModel tableModel;
-
-    public ClientFrame() {
+    public ClientFrame(User currentUser, JobStore jobStore) {
         super("Job Owner View");
+        this.currentUser = currentUser;
+        this.jobStore = jobStore;
 
-        submitJobButton();
-        createTable();
-        createPanel();
+        String[] columns = {
+            "Client ID", "Job ID", "Job Type",
+            "Duration", "Deadline", "Status"
+        };
 
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
-    }
-
-    class AddJobListener implements ActionListener {
-        public void actionPerformed(ActionEvent event) {
-
-            if (jobSubmissionFrame == null || !jobSubmissionFrame.isDisplayable()) {
-                // popup gets the table so submitted jobs show up here
-                jobSubmissionFrame = new JobSubmissionFrame(tableModel);
-            }
-
-            jobSubmissionFrame.setVisible(true);
-            jobSubmissionFrame.toFront();
-        }
-    }
-
-    // 10/25/2026, Anthony - hides the dashboard to reveal the login frame underneath
-    class BackListener implements ActionListener {
-        public void actionPerformed(ActionEvent event) {
-            setVisible(false); //hides the Client Frame window
-        }
-    }
-
-    private void submitJobButton() {
-        submitJobButton = new JButton("Submit Job");
-        ActionListener listener = new AddJobListener();
-        submitJobButton.addActionListener(listener);
-
-        // 10/25/2026, Anthony - creates and wires back button
-        backButton = new JButton("Back");
-        backButton.addActionListener(new BackListener());
-    }
-
-    private void createTable() {
-
-        String[] columnNames = {"Client ID", "Job ID", "Job Type", "Duration", "Deadline", "Status"};
-
-        // a table model instead of a plain array so new rows can be added while the app runs
-        tableModel = new DefaultTableModel(columnNames, 0) {
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        // dummy rows for now
-        tableModel.addRow(new String[]{"C-901", "J-001", "Language Translation", "2 hours", "10/05/2026", "Completed"});
-        tableModel.addRow(new String[]{"C-902", "J-002", "Image Generation", "1 hour", "10/06/2026", "In Progress"});
-        tableModel.addRow(new String[]{"C-903", "J-003", "Data Analysis", "5 hours", "10/07/2026", "Pending"});
-    }
-
-    private void createPanel() {
+        refreshTable();
 
         JLabel title = new JLabel("Submitted Jobs");
         title.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JLabel intro = new JLabel("All jobs sent to the cloud. Submit a new one below to run it on a vehicle.");
-        intro.setFont(new Font("Arial", Font.PLAIN, 13));
+        JLabel intro = new JLabel(
+                "Jobs submitted to the vehicular cloud.");
 
-        JPanel introPanel = new JPanel(new BorderLayout(0, 4));
-        introPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 8, 20));
-        introPanel.add(title, BorderLayout.NORTH);
-        introPanel.add(intro, BorderLayout.CENTER);
+        JPanel header = new JPanel(new GridLayout(2, 1, 0, 5));
+        header.setBorder(
+                BorderFactory.createEmptyBorder(16, 20, 8, 20));
+        header.add(title);
+        header.add(intro);
 
-        JTable jobTable = new JTable(tableModel);
-        jobTable.setFillsViewportHeight(true);
-        jobTable.getTableHeader().setReorderingAllowed(false);
-        jobTable.getTableHeader().setResizingAllowed(false);
+        JTable table = new JTable(tableModel);
+        table.setFillsViewportHeight(true);
+        table.getTableHeader().setReorderingAllowed(false);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
-        buttonPanel.add(submitJobButton);
-        buttonPanel.add(backButton); // 10/25/2026, Anthony - add back button to the panel
+        JPanel actions = new JPanel();
 
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.add(introPanel, BorderLayout.NORTH);
-        mainPanel.add(new JScrollPane(jobTable), BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        if ("JOB_OWNER".equals(currentUser.getRole())) {
+            JButton submit = new JButton("Submit Job");
 
-        add(mainPanel);
+            submit.addActionListener(e ->
+                    new JobSubmissionFrame(
+                            currentUser, jobStore, this)
+                            .setVisible(true));
+
+            actions.add(submit);
+        }
+
+        JButton back = new JButton("Back");
+        back.addActionListener(e -> setVisible(false));
+        actions.add(back);
+
+        JPanel main = new JPanel(new BorderLayout(10, 10));
+        main.add(header, BorderLayout.NORTH);
+        main.add(new JScrollPane(table), BorderLayout.CENTER);
+        main.add(actions, BorderLayout.SOUTH);
+
+        add(main);
+        setSize(1280, 720);
+        setLocationRelativeTo(null);
+    }
+
+    // Refreshes the table using actual Job instances.
+    public void refreshTable() {
+        tableModel.setRowCount(0);
+
+        for (Job job : jobStore.getVisibleJobs(currentUser)) {
+            tableModel.addRow(new Object[] {
+                job.getOwnerId(),
+                job.getId(),
+                job.getType(),
+                job.getDuration() + " hours",
+                job.getDeadline(),
+                job.getStatus()
+            });
+        }
     }
 }
 
-
+// Job submission form creates actual Job instances.
 class JobSubmissionFrame extends JFrame {
+    private final User currentUser;
+    private final JobStore jobStore;
+    private final ClientFrame clientFrame;
 
-    private JTextField clientIdField;
-    private JTextField jobIdField;
-    private JComboBox<String> jobTypeBox;
-    private JTextField jobDurationField;
-    private JTextField jobDeadlineField;
+    private final JTextField clientId = new JTextField(20);
+    private final JTextField jobId = new JTextField(20);
 
-    private JButton submitButton;
-    private JButton backButton; // 10/25/2026, Anthony - Declare back button
+    private final JComboBox<String> jobType =
+            new JComboBox<String>(new String[] {
+                "Language Translation",
+                "Image Generation",
+                "Data Analysis",
+                "Video Rendering"
+            });
 
-    // client frame's table, new jobs go here
-    private DefaultTableModel tableModel;
+    private final JTextField duration = new JTextField(20);
+    private final JTextField deadline = new JTextField(20);
 
-    public JobSubmissionFrame(DefaultTableModel tableModel) {
+    JobSubmissionFrame(User currentUser,
+            JobStore jobStore, ClientFrame clientFrame) {
 
         super("Submit Job");
-        this.tableModel = tableModel;
+        this.currentUser = currentUser;
+        this.jobStore = jobStore;
+        this.clientFrame = clientFrame;
 
-        createFields();
-        createButton();
-        createPanel();
+        // Get the client identity from the logged-in user.
+        clientId.setText(currentUser.getUsername());
+        clientId.setEditable(false);
 
+        JPanel fields = new JPanel(new GridLayout(0, 2, 5, 5));
+
+        fields.add(new JLabel("Client ID:"));
+        fields.add(clientId);
+
+        fields.add(new JLabel("Job ID:"));
+        fields.add(jobId);
+
+        fields.add(new JLabel("Job Type:"));
+        fields.add(jobType);
+
+        fields.add(new JLabel("Job Duration (hours):"));
+        fields.add(duration);
+
+        fields.add(new JLabel("Job Deadline (MM/dd/yyyy):"));
+        fields.add(deadline);
+
+        JButton submit = new JButton("Submit");
+        submit.addActionListener(e -> submitJob());
+
+        JButton back = new JButton("Back");
+        back.addActionListener(e -> dispose());
+
+        JPanel actions = new JPanel();
+        actions.add(submit);
+        actions.add(back);
+
+        JPanel main = new JPanel(new BorderLayout(8, 10));
+        main.setBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        main.add(fields, BorderLayout.CENTER);
+        main.add(actions, BorderLayout.SOUTH);
+
+        add(main);
         pack();
-
+        setLocationRelativeTo(clientFrame);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
-    private void createFields() {
+    private void submitJob() {
+        String id = jobId.getText().trim();
+        String type = (String) jobType.getSelectedItem();
+        String hours = duration.getText().trim();
+        String date = deadline.getText().trim();
 
-        clientIdField = new JTextField(20);
-        jobIdField = new JTextField(20);
-        jobDurationField = new JTextField(20);
-        jobDeadlineField = new JTextField(20);
+        // JobStore validates and creates a Job instance.
+        if (!jobStore.submitJob(
+                currentUser, id, type, hours, date)) {
 
-        // dropdown so job types are always spelled the same
-        String[] jobTypes = {"Language Translation", "Image Generation", "Data Analysis", "Video Rendering"};
-        jobTypeBox = new JComboBox<String>(jobTypes);
-    }
-
-    private void createButton() {
-
-        this.submitButton = new JButton("Submit");
-        this.submitButton.addActionListener(new SubmitListener());
-
-        // 10/25/2026, Anthony - creates and wire back button
-        this.backButton = new JButton("Back");
-        this.backButton.addActionListener(new BackListener());
-    }
-
-    private void createPanel() {
-
-        JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
-
-        formPanel.add(new JLabel("Client ID:"));
-        formPanel.add(clientIdField);
-
-        formPanel.add(new JLabel("Job ID:"));
-        formPanel.add(jobIdField);
-
-        formPanel.add(new JLabel("Job Type:"));
-        formPanel.add(jobTypeBox);
-
-        formPanel.add(new JLabel("Job Duration (hours):"));
-        formPanel.add(jobDurationField);
-
-        formPanel.add(new JLabel("Job Deadline:"));
-        formPanel.add(jobDeadlineField);
-
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(this.submitButton);
-        buttonPanel.add(this.backButton); // 10/25/2026, Anthony - add the back button to the buttonPanel
-
-
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        mainPanel.setBorder(
-                BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        );
-
-        mainPanel.add(formPanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        add(mainPanel);
-    }
-
-
-    class SubmitListener implements ActionListener {
-
-        public void actionPerformed(ActionEvent event) {
-
-            String clientId = clientIdField.getText();
-            String jobId = jobIdField.getText();
-            String jobType = (String) jobTypeBox.getSelectedItem();
-            String jobDuration = jobDurationField.getText();
-            String jobDeadline = jobDeadlineField.getText();
-
-            // admin frame reads these labels back, keep them in sync
-            TransactionLog.append(
-                    "Client: " + clientId +
-                    ", Job ID: " + jobId +
-                    ", Job Type: " + jobType +
-                    ", Job Duration: " + jobDuration +
-                    ", Job Deadline: " + jobDeadline
-            );
-
-            tableModel.addRow(new String[]{clientId, jobId, jobType, jobDuration + " hours", jobDeadline, "Pending"});
-
-            JobSubmissionFrame.this.dispose();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Job not submitted. Check the ID, positive duration, date (MM/dd/yyyy) or permissions.",
+                    "Invalid Job",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
         }
-    }
 
-    // 10/25/2026, Anthony - creates an action listener that activates when a user presses the back button
-    class BackListener implements ActionListener {
-        public void actionPerformed(ActionEvent event) {
-            dispose();
-        }
-    }
+        // Retrieve the newly saved Job instance.
+        Job job = jobStore.getJob(currentUser, id);
 
+        // Record the successfully submitted job.
+        TransactionLog.append(
+                "Client: " + job.getOwnerId()
+                + ", Job ID: " + job.getId()
+                + ", Job Type: " + job.getType()
+                + ", Job Duration: " + job.getDuration()
+                + ", Job Deadline: " + job.getDeadline());
+
+        clientFrame.refreshTable();
+        dispose();
+    }
 }
