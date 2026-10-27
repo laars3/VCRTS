@@ -7,6 +7,15 @@ public class User{
     private String password;
     private String role;
 
+    
+    // Unique ID for the user
+    private String userId;
+
+    // User's personal information
+    private String name;
+    private String email;
+
+
     public User(String username, String password, String role){
         this.username = username;
         this.password = password;
@@ -27,4 +36,36 @@ public class User{
     public String getRole(){
         return role;
     }
+    
+    // Returns user ID
+    public String getUserId() {
+        return userId;
+    }
+
+    // Sets user ID
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    // Returns user's name
+    public String getName() {
+        return name;
+    }
+
+    // Updates user's name
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    // Returns email
+    public String getEmail() {
+        return email;
+    }
+
+    // Updates email
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 }
+
