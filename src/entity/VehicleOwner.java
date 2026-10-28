@@ -7,56 +7,114 @@ import java.util.List;
 public class VehicleOwner extends User {
 
     // Unique ID for the vehicle owner
-    private String ownerId;
+    private final String ownerId;
 
-    // Vehicles owned by this user
-    private List<Vehicle> vehicles = new ArrayList<>();
+    // List of vehicles owned by this user
+    private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
     // Constructor
-    public VehicleOwner(String ownerId,
-                        String username,
-                        String password) {
+    public VehicleOwner(String ownerId, String username, String password) {
         super(username, password, "VEHICLE_OWNER");
         this.ownerId = ownerId;
     }
-// Returns the owner's ID
+
+    // Returns the owner's ID
     public String getOwnerId() {
         return ownerId;
     }
 
-    // Returns the owner's vehicles
+    // Returns a copy of the owner's vehicles
     public List<Vehicle> getVehicles() {
-        return new ArrayList<>(vehicles);
+        return new ArrayList<Vehicle>(vehicles);
     }
 
-    // Gets information about a vehicle
+    // Finds a vehicle using its ID
     public Vehicle getVehicleInfo(String vehicleId) {
-        // TODO: Search the vehicle list using vehicleId
-        // TODO: Return the matching vehicle
+        if (!hasVehicleId(vehicleId)) {
+            return null;
+        }
+
+        for (Vehicle vehicle : vehicles) {
+            if (vehicle.getVehicleId() != null
+                    && vehicle.getVehicleId().equalsIgnoreCase(vehicleId.trim())) {
+                return vehicle;
+            }
+        }
+
         return null;
     }
-  // Registers a new vehicle
+
+    // Registers a new vehicle
     public void registerVehicle(Vehicle vehicle) {
-        // TODO: Check if the vehicle is already registered
-        // TODO: Add the vehicle to the owner's list
+        if (vehicle == null || !hasVehicleId(vehicle.getVehicleId())) {
+            return;
+        }
+
+        // Check ownership and avoid duplicate vehicles
+        if (!belongsToOwner(vehicle)
+                || getVehicleInfo(vehicle.getVehicleId()) != null) {
+            return;
+        }
+
+        vehicles.add(vehicle);
     }
 
-    // Removes a vehicle
+    // Removes a registered vehicle
     public void removeVehicle(String vehicleId) {
-        // TODO: Find the vehicle using its ID
-        // TODO: Remove it from the owner's list
+        Vehicle vehicle = getVehicleInfo(vehicleId);
+
+        if (vehicle == null) {
+            return;
+        }
+
+        // Mark the vehicle unavailable before removing it
+        vehicle.setAvailability(false);
+        vehicles.remove(vehicle);
     }
 
     // Updates vehicle availability
     public void updateVehicleAvailability(
             String vehicleId, boolean available) {
-        // TODO: Find the vehicle
-        // TODO: Update its availability status
+
+        Vehicle vehicle = getVehicleInfo(vehicleId);
+
+        if (vehicle != null) {
+            vehicle.setAvailability(available);
+        }
     }
 
-    // Erases stored vehicle data
+    // Clears changeable vehicle data and removes its registration
     public void eraseData(String vehicleId) {
-        // TODO: Find the vehicle
-        // TODO: Remove its stored data safely
+        Vehicle vehicle = getVehicleInfo(vehicleId);
+
+        if (vehicle == null) {
+            return;
+        }
+
+        vehicle.setArrivalTime(null);
+        vehicle.setDepartureTime(null);
+        vehicle.setScheduleKnown(false);
+
+        removeVehicle(vehicleId);
+    }
+
+    // Helper method to validate a vehicle ID
+    private boolean hasVehicleId(String vehicleId) {
+        return vehicleId != null && !vehicleId.trim().isEmpty();
+    }
+
+    // Helper method to check vehicle ownership
+    private boolean belongsToOwner(Vehicle vehicle) {
+        String vehicleOwnerId = vehicle.getOwnerId();
+
+        if (vehicleOwnerId == null) {
+            return false;
+        }
+
+        // VehicleStore uses the username as the owner ID
+        return vehicleOwnerId.equalsIgnoreCase(getUsername())
+                || (ownerId != null
+                && vehicleOwnerId.equalsIgnoreCase(ownerId));
     }
 }
+
