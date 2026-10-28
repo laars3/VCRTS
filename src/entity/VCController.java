@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class VCController extends User{
 
  private String controllerId;
@@ -13,9 +14,8 @@ public class VCController extends User{
     private Server server;
 
 // Constructor
-    public VCController(String controllerId,
-                        String username,
-                        String password) {
+    public VCController(String controllerId,String username, String password) {
+
     super(username, password, "VCC");
       this.controllerId = controllerId;
     }
@@ -69,6 +69,38 @@ public class VCController extends User{
         // TODO: Check if the vehicle is available
         // TODO: Assign the job to the vehicle
         // TODO: Update the job status
+    }
+
+    // sorts jobs by priority, sets each job's wait and completion, returns the average wait
+    public double computeCompletionTimes(List<Job> jobs) {
+        if (jobs.isEmpty()) {
+            return 0;
+        }
+
+        List<Job> order = mergeSort(jobs);
+        double time = 0;
+        double totalWait = 0;
+
+        for (Job job : order) {
+
+        }
+
+        return totalWait / jobs.size();
+    }
+
+    // splits the list in half, sorts each half, merges them
+    private List<Job> mergeSort(List<Job> jobs) {
+
+        return new ArrayList<>(jobs);
+    }
+
+    // combines two sorted lists into one sorted list, ties stay in order
+    private List<Job> merge(List<Job> left, List<Job> right) {
+        List<Job> result = new ArrayList<>();
+        int i = 0;
+        int j = 0;
+
+        return result;
     }
 
     // Adds a checkpoint to a job
