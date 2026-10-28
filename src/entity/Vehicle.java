@@ -1,8 +1,6 @@
 package entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class Vehicle {
     private final String make;
@@ -18,7 +16,6 @@ public final class Vehicle {
     private boolean scheduleKnown;
     private LocalDateTime arrivalTime;
     private LocalDateTime departureTime;
-    private List<Job> processingJobs = new ArrayList<>();
 
     // Keeps the old constructor available.
     public Vehicle(String make, String model, int year, String licensePlate) {
@@ -120,11 +117,6 @@ public final class Vehicle {
         this.departureTime = departureTime;
     }
 
-    // Returns jobs assigned to this vehicle
-    public List<Job> getProcessingJobs() {
-        return new ArrayList<>(processingJobs);
-    }
-
     // Checks if a vehicle can process a job
     public boolean canProcess(Job job) {
         // TODO: Check if the vehicle is available
@@ -132,18 +124,5 @@ public final class Vehicle {
         // TODO: Check if the vehicle has enough residency time
         // TODO: Return true if the vehicle can process the job
         return false;
-    }
-
-    // Assigns a job to the vehicle
-    public void assignJob(Job job) {
-        // TODO: Check if the job is valid
-        // TODO: Check if the vehicle can process the job
-        // TODO: Add the job to processingJobs
-    }
-
-    // Removes a job from the vehicle
-    public void removeJob(String jobId) {
-        // TODO: Find the job using its ID
-        // TODO: Remove the job from processingJobs
     }
 }

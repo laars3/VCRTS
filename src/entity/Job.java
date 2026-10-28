@@ -26,8 +26,6 @@ public final class Job {
     private double waitTime;
     private double scheduledCompletion;
 
-    // Vehicles assigned to process this job
-    private List<Vehicle> processingVehicles = new ArrayList<>();
 
     // Checkpoints saved during processing
     private List<JobProgressionCheckpoint> checkpoints =
@@ -121,21 +119,9 @@ public final class Job {
         this.scheduledCompletion = scheduledCompletion;
     }
 
-    // Returns vehicles assigned to the job
-    public List<Vehicle> getProcessingVehicles() {
-        return new ArrayList<>(processingVehicles);
-    }
-
     // Returns checkpoints belonging to the job
     public List<JobProgressionCheckpoint> getCheckpoints() {
         return new ArrayList<>(checkpoints);
-    }
-
-    // Assigns a vehicle to process the job
-    public void assignVehicle(Vehicle vehicle) {
-        // TODO: Check if the vehicle is available
-        // TODO: Check if the vehicle is already assigned
-        // TODO: Add the vehicle to processingVehicles
     }
 
     // Adds a checkpoint to the job

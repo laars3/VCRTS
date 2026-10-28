@@ -24,7 +24,7 @@ public final class JobStore {
         if (jobs.containsKey(key(id))) return false;
         // New jobs start pending and belong to the logged-in user.
         jobs.put(key(id), new Job(id.trim(), user.getUsername(), type,
-                Double.parseDouble(duration.trim()), deadline, "Pending"));
+                Double.parseDouble(duration.trim()), deadline, 1, "Pending"));
         return true;
     }
     public boolean updateJob(User user, String id, String type, String duration, String deadline) {
@@ -34,7 +34,7 @@ public final class JobStore {
         // Jobs can only be edited before they start.
         if (!"Pending".equals(old.getStatus())) return false;
         jobs.put(key(id), new Job(old.getId(), old.getOwnerId(), type,
-                Double.parseDouble(duration.trim()), deadline, old.getStatus()));
+                Double.parseDouble(duration.trim()), deadline, old.getPriority(), old.getStatus()));
         return true;
     }
     public Job getJob(User user, String id) {
