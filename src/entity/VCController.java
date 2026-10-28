@@ -4,11 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
-* Controls vechiles and jobs in vehicular cloud
-* inheirits from user account info from User
-*/
-
 public class VCController extends User{
 
  private String controllerId;

@@ -13,6 +13,7 @@ public final class Job {
     private final String type;
     private final double duration;
     private final String deadline;
+    private final int priority;
 
     // Current job status
     private String status;
@@ -22,6 +23,9 @@ public final class Job {
     private double completionPercent;
     private LocalDateTime completionTime;
 
+    private double waitTime;
+    private double scheduledCompletion;
+
     // Vehicles assigned to process this job
     private List<Vehicle> processingVehicles = new ArrayList<>();
 
@@ -30,15 +34,14 @@ public final class Job {
             new ArrayList<>();
 
     // Constructor
-    public Job(String id, String ownerId, String type,
-               double duration, String deadline, String status) {
-
+    public Job(String id, String ownerId, String type, double duration, String deadline, int priority, String status) {
         this.id = id;
         this.ownerId = ownerId;
         this.type = type;
         this.duration = duration;
         this.deadline = deadline;
         this.status = status;
+        this.priority = priority;
     }
 
     // Returns the job ID
@@ -94,6 +97,28 @@ public final class Job {
     // Returns completion time
     public LocalDateTime getCompletionTime() {
         return completionTime;
+    }
+
+    // gets priority of each job, then returns lowest number
+
+    public int getPriority(){
+        return priority;
+    }
+
+    public double getWaitTime(){
+        return waitTime;
+    }
+
+    public void setWaitTime(double waitTime){
+        this.waitTime = waitTime;
+    }
+
+    public double getScheduledCompletion(){
+        return scheduledCompletion;
+    }
+
+    public void setScheduledCompletion(double scheduledCompletion){
+        this.scheduledCompletion = scheduledCompletion;
     }
 
     // Returns vehicles assigned to the job
