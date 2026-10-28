@@ -1,3 +1,4 @@
+
 package gui;
 
 import java.awt.*;
@@ -6,290 +7,353 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import entity.User;
+import entity.Vehicle;
+import storage.VehicleStore;
 import storage.TransactionLog;
 
-public class OwnerFrame extends JFrame{
-    private static final int FRAME_WIDTH = 1280;
-    private static final int FRAME_HEIGHT = 720;
+public class OwnerFrame extends JFrame {
 
-    private JButton button;
-    private JButton backButton; // 10/25/2026 - anthony - Declares a back button variable
-    private RegistrationFrame registrationFrame;
+    private final User currentUser;
+    private final VehicleStore vehicleStore;
+
     private DefaultTableModel tableModel;
+    private JButton registrationButton;
+    private JButton backButton;
+    private RegistrationFrame registrationFrame;
 
-    public OwnerFrame(){
-
+    // Constructor only initializes and calls helper methods.
+    public OwnerFrame(User user, VehicleStore store) {
         super("Owner View");
-        setSize(1280, 720);
-        setLocationRelativeTo(null);
-        
-        setLayout(new BorderLayout(10, 10));
-        registrationButton();
+
+        currentUser = user;
+        vehicleStore = store;
+
         createTable();
+        createButtons();
         createPanel();
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        refreshTable();
+        setupFrame();
     }
 
-    private void registrationButton(){
-        button = new JButton("Register Vehicle");
-
-        ActionListener listener = new AddRegistrationListener();
-        button.addActionListener(listener);
-
-        // 10/25/2026, Anthony - creates and wires back button
-        backButton = new JButton("Back");
-        backButton.addActionListener(new BackListener());
-    }
-
-    class AddRegistrationListener implements ActionListener{
-        public void actionPerformed(ActionEvent event){
-            if (registrationFrame == null || !registrationFrame.isDisplayable()){
-                registrationFrame = new RegistrationFrame(tableModel);
-            }
-            registrationFrame.setVisible(true);
-            registrationFrame.toFront();
-        }
-    }
-
-    // 10/25/2026, Anthony - hides the dashboard to reveal the login frame underneath
-    class BackListener implements ActionListener {
-        public void actionPerformed(ActionEvent event) {
-            setVisible(false); //hides the OwnerFrame window
-        }
-    }
-
-    private void createTable(){
-        String[] columnNames = {"Owner ID", "Manufacturer", "Model", "Year", "Computation Power", "Residency"};
-
-        // dummy rows for now
-        String[][] dummyData = {
-                {"O-101", "Tesla", "Model 3", "2023", "High", "8 hours"},
-                {"O-102", "Ford", "Mustang Mach-E", "2022", "Medium", "4 hours"},
-                {"O-103", "Chevrolet", "Bolt EV", "2021", "Low", "12 hours"},
-                {"O-104", "Rivian", "R1T", "2024", "High", "24 hours"}
+    // Helper method to create the vehicle table.
+    private void createTable() {
+        String[] columns = {
+            "Vehicle ID", "Manufacturer", "Model",
+            "Year", "Computation Power", "Residency"
         };
 
-        // cant edit cells in the ui, rows only get added with addRow
-        tableModel = new DefaultTableModel(dummyData, columnNames){
-            public boolean isCellEditable(int row, int column){
+        tableModel = new DefaultTableModel(columns, 0) {
+            public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
     }
 
-    private void createPanel(){
-        JLabel title = new JLabel("Available Vehicles");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+    // Helper method to create buttons.
+    private void createButtons() {
+        registrationButton = new JButton("Register Vehicle");
+        registrationButton.addActionListener(
+            new AddRegistrationListener()
+        );
 
-        JLabel intro = new JLabel("All vehicles currently in the cloud. Register yours below to rent out its computing power.");
-        intro.setFont(new Font("Arial", Font.PLAIN, 13));
-
-        JPanel introPanel = new JPanel(new BorderLayout(0, 4));
-        introPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 8, 20));
-        introPanel.add(title, BorderLayout.NORTH);
-        introPanel.add(intro, BorderLayout.CENTER);
-
-        JTable vehicleTable = new JTable(tableModel);
-        vehicleTable.setFillsViewportHeight(true);
-        vehicleTable.getTableHeader().setReorderingAllowed(false);
-        vehicleTable.getTableHeader().setResizingAllowed(false);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
-        buttonPanel.add(button);
-        buttonPanel.add(backButton); // 10/25/2026, Anthony - add back button to the panel
-
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.add(introPanel, BorderLayout.NORTH);
-        mainPanel.add(new JScrollPane(vehicleTable), BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        add(mainPanel);
-    }
-}
-
-class RegistrationFrame extends JFrame{
-
-    private JTextField ownerIdField;
-    private JTextField vehicleManufacturerField;
-    private JTextField vehicleModelField;
-    private JTextField vehicleYearField;
-    private JTextField compPowField;
-    private JTextField residencyField;
-
-    private JButton submitButton;
-    private JButton backButton; // 10/25/2026, Anthony - Declares a back button variable
-
-    private static final int OWNER_ID_MIN = 3;
-    private static final int OWNER_ID_MAX = 8;
-    private static final String OWNER_ID_PATTERN = "[A-Za-z0-9_-]+";
-
-    private static final int TEXT_MIN = 2;
-    private static final int TEXT_MAX = 30;
-    private static final String TEXT_PATTERN = "[A-Za-z0-9 .-]+";
-    private static final int YEAR_MIN = 1900;
-    private static final int RESIDENCY_MIN = 1;
-    private static final int RESIDENCY_MAX = 168;
-
-    // owner frame's table, new vehicles go here
-    private DefaultTableModel tableModel;
-
-    public RegistrationFrame(DefaultTableModel tableModel){
-        super("Register Vehicle");
-        this.tableModel = tableModel;
-        createTextFields();
-        createButton();
-        createPanel();
-        pack();
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    }
-    private void createTextFields(){
-        ownerIdField = new JTextField(20);
-        vehicleManufacturerField = new JTextField(20);
-        vehicleModelField = new JTextField(20);
-        vehicleYearField = new JTextField(20);
-        compPowField = new JTextField(20);
-        residencyField = new JTextField(20);
-    }
-
-    private void createButton(){
-        submitButton = new JButton("Submit");
-        submitButton.addActionListener(new SubmitListener());
-
-        // 10/25/2026, Anthony - creates and wire the back button in createButton()
         backButton = new JButton("Back");
         backButton.addActionListener(new BackListener());
     }
 
-    private void createPanel(){
+    // Helper method to build the GUI.
+    private void createPanel() {
+        JLabel title = new JLabel("Available Vehicles");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JPanel formPanel = new JPanel(new GridLayout(0, 2, 5, 5));
-        formPanel.add(new JLabel("Owner ID:"));
-        formPanel.add(ownerIdField);
-        formPanel.add(new JLabel("Vehicle Manufacturer:"));
-        formPanel.add(vehicleManufacturerField);
-        formPanel.add(new JLabel("Vehicle Model:"));
-        formPanel.add(vehicleModelField);
-        formPanel.add(new JLabel("Vehicle Year:"));
-        formPanel.add(vehicleYearField);
-        formPanel.add(new JLabel("Vehicle Computation Power:"));
-        formPanel.add(compPowField);
-        formPanel.add(new JLabel("Residency (hours):"));
-        formPanel.add(residencyField);
+        JLabel intro = new JLabel(
+            "Vehicles registered with the vehicular cloud."
+        );
+
+        JPanel header = new JPanel(new GridLayout(2, 1));
+        header.add(title);
+        header.add(intro);
+
+        JTable table = new JTable(tableModel);
+        table.setFillsViewportHeight(true);
+        table.getTableHeader().setReorderingAllowed(false);
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(submitButton);
-        buttonPanel.add(backButton); // 10/25/2026, Anthony - add the back button to the buttonPanel
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
-        mainPanel.add(formPanel, BorderLayout.CENTER);
+        if ("VEHICLE_OWNER".equals(currentUser.getRole())) {
+            buttonPanel.add(registrationButton);
+        }
+
+        buttonPanel.add(backButton);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+
+        mainPanel.setBorder(
+            BorderFactory.createEmptyBorder(16, 20, 16, 20)
+        );
+
+        mainPanel.add(header, BorderLayout.NORTH);
+        mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
     }
-    class SubmitListener implements ActionListener{
-        public void actionPerformed(ActionEvent event){
-            String ownerId = ownerIdField.getText().trim();
-            String vManufacturer = vehicleManufacturerField.getText().trim();
-            String vModel = vehicleModelField.getText().trim();
-            String vYear = vehicleYearField.getText().trim();
-            String vComp = compPowField.getText().trim();
-            String residency = residencyField.getText().trim();
 
+    // Helper method to configure the window.
+    private void setupFrame() {
+        setSize(1280, 720);
+        setLocationRelativeTo(null);
+    }
 
-            if(ownerId.length() < OWNER_ID_MIN || ownerId.length() > OWNER_ID_MAX) {
-                showError("Owner ID length should be between " + OWNER_ID_MIN + " and " + OWNER_ID_MAX);
-                return;
+    // Helper method to open vehicle registration.
+    private void openRegistrationFrame() {
+        if (registrationFrame == null
+                || !registrationFrame.isDisplayable()) {
 
-            }
+            registrationFrame = new RegistrationFrame(
+                currentUser, vehicleStore, this
+            );
+        }
 
-            if(!ownerId.matches(OWNER_ID_PATTERN)) {
-                showError("Owner ID can only use letters, numbers, - and _ (no spaces).");
-                return;
-            }
+        registrationFrame.setVisible(true);
+        registrationFrame.toFront();
+    }
 
-            // manufacturer
-            if(vManufacturer.length() < TEXT_MIN || vManufacturer.length() > TEXT_MAX) {
-                showError("Manufacturer must be " + TEXT_MIN + " to " + TEXT_MAX + " characters.");
-                return;
-            }
-            if(!vManufacturer.matches(TEXT_PATTERN)) {
-                showError("Manufacturer can only use letters, numbers, spaces, . and -");
-                return;
-            }
-
-            // model
-            if(vModel.length() < TEXT_MIN || vModel.length() > TEXT_MAX) {
-                showError("Model must be " + TEXT_MIN + " to " + TEXT_MAX + " characters.");
-                return;
-            }
-            if(!vModel.matches(TEXT_PATTERN)) {
-                showError("Model can only use letters, numbers, spaces, . and -");
-                return;
-            }
-
-            // year
-            int year;
-            try {
-                year = Integer.parseInt(vYear);
-            } catch(NumberFormatException e) {
-                showError("Year must be a whole number like 2023.");
-                return;
-            }
-            int maxYear = java.time.Year.now().getValue() + 1;
-            if(year < YEAR_MIN || year > maxYear) {
-                showError("Year must be between " + YEAR_MIN + " and " + maxYear + ".");
-                return;
-            }
-
-            // computation power
-            if(!vComp.matches("(0|[1-9][0-9]*)(\\.[0-9]+)?")) {
-                showError("Computation power must be a plain number like 100 or 12.5 (no leading zeros).");
-                return;
-            }
-            double power;
-            try {
-                power = Double.parseDouble(vComp);
-            } catch(NumberFormatException e) {
-                showError("Computation power must be a number.");
-                return;
-            }
-            if(Double.isNaN(power) || Double.isInfinite(power) || power <= 0) {
-                showError("Computation power must be greater than 0.");
-                return;
-            }
-
-            // residency hours
-            int hours;
-            try {
-                hours = Integer.parseInt(residency);
-            } catch(NumberFormatException e) {
-                showError("Residency must be a whole number of hours.");
-                return;
-            }
-            if(hours < RESIDENCY_MIN || hours > RESIDENCY_MAX) {
-                showError("Residency must be between " + RESIDENCY_MIN + " and " + RESIDENCY_MAX + " hours.");
-                return;
-            }
-
-
-
-            TransactionLog.append("Owner: " + ownerId + ", " + "Vehicle Manufacturer: " + vManufacturer + ", " + "Vehicle Model: " + vModel + ", " + "Vehicle Year: " + year + ", " + "Vehicle Computation Power: " + vComp + ", " + "Vehicle Residency: " + hours);
-            tableModel.addRow(new String[]{ownerId, vManufacturer, vModel, String.valueOf(year), vComp, hours + " hours"});
-            RegistrationFrame.this.dispose();
+    // Regular listener for registering a vehicle.
+    class AddRegistrationListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            openRegistrationFrame();
         }
     }
 
-class BackListener implements ActionListener {
-        public void actionPerformed (ActionEvent event) {
+    // Regular listener for the back button.
+    class BackListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            setVisible(false);
+        }
+    }
+
+    // Helper method to display stored Vehicle instances.
+    public void refreshTable() {
+        tableModel.setRowCount(0);
+
+        for (Vehicle vehicle :
+                vehicleStore.getVisibleVehicles(currentUser)) {
+
+            tableModel.addRow(new Object[] {
+                vehicle.getVehicleId(),
+                vehicle.getMake(),
+                vehicle.getModel(),
+                vehicle.getYear(),
+                vehicle.getComputationPower(),
+                vehicle.getResidency() + " hours"
+            });
+        }
+    }
+}
+
+
+// Registration window.
+class RegistrationFrame extends JFrame {
+
+    private final User currentUser;
+    private final VehicleStore vehicleStore;
+    private final OwnerFrame ownerFrame;
+
+    private JTextField vehicleIdField;
+    private JTextField manufacturerField;
+    private JTextField modelField;
+    private JTextField yearField;
+    private JTextField powerField;
+    private JTextField residencyField;
+
+    private JButton submitButton;
+    private JButton backButton;
+
+    public RegistrationFrame(User user,
+            VehicleStore store, OwnerFrame frame) {
+
+        super("Register Vehicle");
+
+        currentUser = user;
+        vehicleStore = store;
+        ownerFrame = frame;
+
+        createTextFields();
+        createButtons();
+        createPanel();
+        setupFrame();
+    }
+
+    // Helper method for text fields.
+    private void createTextFields() {
+        vehicleIdField = new JTextField(20);
+        manufacturerField = new JTextField(20);
+        modelField = new JTextField(20);
+        yearField = new JTextField(20);
+        powerField = new JTextField(20);
+        residencyField = new JTextField(20);
+    }
+
+    // Helper method for buttons.
+    private void createButtons() {
+        submitButton = new JButton("Submit");
+        submitButton.addActionListener(new SubmitListener());
+
+        backButton = new JButton("Back");
+        backButton.addActionListener(new BackListener());
+    }
+
+    // Helper method for GUI layout.
+    private void createPanel() {
+        JPanel fields = new JPanel(new GridLayout(0, 2, 5, 5));
+
+        fields.add(new JLabel("Vehicle ID:"));
+        fields.add(vehicleIdField);
+
+        fields.add(new JLabel("Manufacturer:"));
+        fields.add(manufacturerField);
+
+        fields.add(new JLabel("Model:"));
+        fields.add(modelField);
+
+        fields.add(new JLabel("Year:"));
+        fields.add(yearField);
+
+        fields.add(new JLabel("Computation Power:"));
+        fields.add(powerField);
+
+        fields.add(new JLabel("Residency (hours):"));
+        fields.add(residencyField);
+
+        JPanel buttons = new JPanel();
+        buttons.add(submitButton);
+        buttons.add(backButton);
+
+        JPanel main = new JPanel(new BorderLayout(10, 10));
+
+        main.setBorder(
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        );
+
+        main.add(fields, BorderLayout.CENTER);
+        main.add(buttons, BorderLayout.SOUTH);
+
+        add(main);
+    }
+
+    // Helper method to configure the window.
+    private void setupFrame() {
+        pack();
+        setLocationRelativeTo(ownerFrame);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+
+    // Regular submit listener.
+    class SubmitListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            submitRegistration();
+        }
+    }
+
+    // Regular back listener.
+    class BackListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
             dispose();
         }
     }
 
-    private void showError(String message){
-        JOptionPane.showMessageDialog(this, message);
+    // Helper method to validate registration inputs.
+    private boolean validateFields() {
+        String id = vehicleIdField.getText().trim();
+        String make = manufacturerField.getText().trim();
+        String model = modelField.getText().trim();
+
+        if (!id.matches("[A-Za-z0-9_-]{3,8}")) {
+            showError("Vehicle ID must be 3-8 characters.");
+            return false;
+        }
+
+        if (!make.matches("[A-Za-z0-9 .-]{2,30}")
+                || !model.matches("[A-Za-z0-9 .-]{2,30}")) {
+            showError("Manufacturer and model must be 2-30 characters.");
+            return false;
+        }
+
+        try {
+            int year = Integer.parseInt(yearField.getText().trim());
+            int residency = Integer.parseInt(
+                residencyField.getText().trim()
+            );
+
+            if (year < 1900
+                    || year > java.time.Year.now().getValue() + 1
+                    || residency < 1 || residency > 168) {
+
+                showError("Invalid year or residency.");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            showError("Year and residency must be whole numbers.");
+            return false;
+        }
+
+        return true;
     }
 
+    // Helper method to create and store the Vehicle instance.
+    private void submitRegistration() {
 
+        if (!validateFields()) {
+            return;
+        }
+
+        String id = vehicleIdField.getText().trim();
+
+        boolean registered = vehicleStore.registerVehicle(
+            currentUser,
+            id,
+            manufacturerField.getText().trim(),
+            modelField.getText().trim(),
+            yearField.getText().trim(),
+            powerField.getText().trim(),
+            residencyField.getText().trim()
+        );
+
+        if (!registered) {
+            showError(
+                "Invalid vehicle information or duplicate Vehicle ID."
+            );
+            return;
+        }
+
+        Vehicle vehicle = vehicleStore.getVehicle(currentUser, id);
+
+        saveTransaction(vehicle);
+        ownerFrame.refreshTable();
+
+        dispose();
+    }
+
+    // Helper method to record a successful registration.
+    private void saveTransaction(Vehicle vehicle) {
+        TransactionLog.append(
+            "Owner: " + currentUser.getUsername()
+            + ", Vehicle ID: " + vehicle.getVehicleId()
+            + ", Vehicle Manufacturer: " + vehicle.getMake()
+            + ", Vehicle Model: " + vehicle.getModel()
+            + ", Vehicle Year: " + vehicle.getYear()
+            + ", Vehicle Computation Power: "
+            + vehicle.getComputationPower()
+            + ", Vehicle Residency: " + vehicle.getResidency()
+        );
+    }
+
+    // Helper method for error messages.
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(
+            this, message, "Invalid Vehicle",
+            JOptionPane.ERROR_MESSAGE
+        );
+    }
 }
