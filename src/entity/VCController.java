@@ -82,7 +82,11 @@ public class VCController extends User{
         double totalWait = 0;
 
         for (Job job : order) {
-
+            job.setWaitTime(time);
+            double completion = time + job.getDuration();
+            job.setScheduledCompletion(completion);
+            totalWait += time;
+            time = completion;
         }
 
         return totalWait / jobs.size();
@@ -90,8 +94,15 @@ public class VCController extends User{
 
     // splits the list in half, sorts each half, merges them
     private List<Job> mergeSort(List<Job> jobs) {
+        if (jobs.size() <= 1) {
+            return new ArrayList<>(jobs);
+        }
 
-        return new ArrayList<>(jobs);
+        int mid = jobs.size() / 2;
+        List<Job> left = mergeSort(new ArrayList<>(jobs.subList(0, mid)));
+        List<Job> right = mergeSort(new ArrayList<>(jobs.subList(mid, jobs.size())));
+
+        return merge(left, right);
     }
 
     // combines two sorted lists into one sorted list, ties stay in order
@@ -99,6 +110,26 @@ public class VCController extends User{
         List<Job> result = new ArrayList<>();
         int i = 0;
         int j = 0;
+
+        // left job wins tie keeping order
+        while (i < left.size() && j < right.size()) {
+            if (left.get(i).getPriority() <= right.get(j).getPriority()) {
+                result.add(left.get(i));
+                i++;
+            } else {
+                result.add(right.get(j));
+                j++;
+            }
+        }
+
+        while (i < left.size()) {
+            result.add(left.get(i));
+            i++;
+        }
+        while (j < right.size()) {
+            result.add(right.get(j));
+            j++;
+        }
 
         return result;
     }
