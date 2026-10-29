@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
-* Controls vechiles and jobs in vehicular cloud
-* inheirits from user account info from User
-*/
 
 public class VCController extends User{
 
@@ -18,9 +14,8 @@ public class VCController extends User{
     private Server server;
 
 // Constructor
-    public VCController(String controllerId,
-                        String username,
-                        String password) {
+    public VCController(String controllerId,String username, String password) {
+
     super(username, password, "VCC");
       this.controllerId = controllerId;
     }
@@ -74,6 +69,74 @@ public class VCController extends User{
         // TODO: Check if the vehicle is available
         // TODO: Assign the job to the vehicle
         // TODO: Update the job status
+    }
+
+    // sorts jobs by priority, sets each job's wait and completion, returns the average wait
+    public double computeCompletionTimes(List<Job> jobs) {
+        if (jobs.isEmpty()) {
+            return 0;
+        }
+
+        List<Job> order = mergeSort(jobs);
+
+        // active jobs holds the run order so the admin view can show it
+        activeJobs.clear();
+        activeJobs.addAll(order);
+
+        double time = 0;
+        double totalWait = 0;
+
+        for (Job job : order) {
+            job.setWaitTime(time);
+            double completion = time + job.getDuration();
+            job.setScheduledCompletion(completion);
+            totalWait += time;
+            time = completion;
+        }
+
+        return totalWait / jobs.size();
+    }
+
+    // splits the list in half, sorts each half, merges them
+    private List<Job> mergeSort(List<Job> jobs) {
+        if (jobs.size() <= 1) {
+            return new ArrayList<>(jobs);
+        }
+
+        int mid = jobs.size() / 2;
+        List<Job> left = mergeSort(new ArrayList<>(jobs.subList(0, mid)));
+        List<Job> right = mergeSort(new ArrayList<>(jobs.subList(mid, jobs.size())));
+
+        return merge(left, right);
+    }
+
+    // combines two sorted lists into one sorted list, ties stay in order
+    private List<Job> merge(List<Job> left, List<Job> right) {
+        List<Job> result = new ArrayList<>();
+        int i = 0;
+        int j = 0;
+
+        // left job wins tie keeping order
+        while (i < left.size() && j < right.size()) {
+            if (left.get(i).getPriority() <= right.get(j).getPriority()) {
+                result.add(left.get(i));
+                i++;
+            } else {
+                result.add(right.get(j));
+                j++;
+            }
+        }
+
+        while (i < left.size()) {
+            result.add(left.get(i));
+            i++;
+        }
+        while (j < right.size()) {
+            result.add(right.get(j));
+            j++;
+        }
+
+        return result;
     }
 
     // Adds a checkpoint to a job

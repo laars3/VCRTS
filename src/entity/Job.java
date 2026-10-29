@@ -13,6 +13,7 @@ public final class Job {
     private final String type;
     private final double duration;
     private final String deadline;
+    private final int priority;
 
     // Current job status
     private String status;
@@ -22,23 +23,23 @@ public final class Job {
     private double completionPercent;
     private LocalDateTime completionTime;
 
-    // Vehicles assigned to process this job
-    private List<Vehicle> processingVehicles = new ArrayList<>();
+    private double waitTime;
+    private double scheduledCompletion;
+
 
     // Checkpoints saved during processing
     private List<JobProgressionCheckpoint> checkpoints =
             new ArrayList<>();
 
     // Constructor
-    public Job(String id, String ownerId, String type,
-               double duration, String deadline, String status) {
-
+    public Job(String id, String ownerId, String type, double duration, String deadline, int priority, String status) {
         this.id = id;
         this.ownerId = ownerId;
         this.type = type;
         this.duration = duration;
         this.deadline = deadline;
         this.status = status;
+        this.priority = priority;
     }
 
     // Returns the job ID
@@ -96,21 +97,31 @@ public final class Job {
         return completionTime;
     }
 
-    // Returns vehicles assigned to the job
-    public List<Vehicle> getProcessingVehicles() {
-        return new ArrayList<>(processingVehicles);
+    // gets priority of each job, then returns lowest number
+
+    public int getPriority(){
+        return priority;
+    }
+
+    public double getWaitTime(){
+        return waitTime;
+    }
+
+    public void setWaitTime(double waitTime){
+        this.waitTime = waitTime;
+    }
+
+    public double getScheduledCompletion(){
+        return scheduledCompletion;
+    }
+
+    public void setScheduledCompletion(double scheduledCompletion){
+        this.scheduledCompletion = scheduledCompletion;
     }
 
     // Returns checkpoints belonging to the job
     public List<JobProgressionCheckpoint> getCheckpoints() {
         return new ArrayList<>(checkpoints);
-    }
-
-    // Assigns a vehicle to process the job
-    public void assignVehicle(Vehicle vehicle) {
-        // TODO: Check if the vehicle is available
-        // TODO: Check if the vehicle is already assigned
-        // TODO: Add the vehicle to processingVehicles
     }
 
     // Adds a checkpoint to the job
