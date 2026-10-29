@@ -4,6 +4,7 @@ import entity.User;
 import entity.Job;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import security.AccessControl;
 import validation.InputValidator;
@@ -13,7 +14,8 @@ public final class JobStore {
     private final UserStore users;
 
     // job id -> job
-    private final HashMap<String, Job> jobs = new HashMap<String, Job>();
+    // linked so jobs come back in arrival order, priority ties depend on it
+    private final HashMap<String, Job> jobs = new LinkedHashMap<String, Job>();
 
     public JobStore(UserStore users) {
         if (users == null) {
