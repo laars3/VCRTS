@@ -215,16 +215,13 @@ public class AdminFrame extends JFrame{
         introPanel.add(title, BorderLayout.NORTH);
         introPanel.add(intro, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        // button under table
+        JPanel buttonPanel = new JPanel();
         buttonPanel.add(refreshButton);
         buttonPanel.add(computeButton);
         buttonPanel.add(ownerViewButton);
         buttonPanel.add(clientViewButton);
         buttonPanel.add(backButton); // 10/25/2026 - anthony - add back button to the panel
-
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(introPanel, BorderLayout.WEST);
-        topPanel.add(buttonPanel, BorderLayout.EAST);
 
         averageLabel = new JLabel("Average waiting time: press Compute Completion Time");
         averageLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -240,8 +237,9 @@ public class AdminFrame extends JFrame{
 
         JPanel mainPanel = new JPanel(new BorderLayout(0, 12));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
-        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(introPanel, BorderLayout.NORTH);
         mainPanel.add(tabs, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
     }
