@@ -78,6 +78,11 @@ public class VCController extends User{
         }
 
         List<Job> order = mergeSort(jobs);
+
+        // active jobs holds the run order so the admin view can show it
+        activeJobs.clear();
+        activeJobs.addAll(order);
+
         double time = 0;
         double totalWait = 0;
 
