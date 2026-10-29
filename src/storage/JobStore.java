@@ -28,7 +28,7 @@ public final class JobStore {
     }
 
     // adds a new pending job owned by the logged in user
-    public boolean submitJob(User user, String id, String type, String duration, String deadline) {
+    public boolean submitJob(User user, String id, String type, String duration, String deadline, int priority) {
         if (!users.isAuthenticated(user)) {
             return false;
         }
@@ -43,7 +43,7 @@ public final class JobStore {
         }
 
         double hours = Double.parseDouble(duration.trim());
-        Job job = new Job(id.trim(), user.getUsername(), type, hours, deadline, 1, "Pending");
+        Job job = new Job(id.trim(), user.getUsername(), type, hours, deadline, priority, "Pending");
         jobs.put(key(id), job);
         return true;
     }
