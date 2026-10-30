@@ -43,7 +43,7 @@ public class ClientFrame extends JFrame {
     private void createTable() {
         String[] columns = {
             "Client ID", "Job ID", "Job Type",
-            "Duration", "Deadline", "Status"
+            "Duration", "Deadline", "Priority", "Status"
         };
 
         tableModel = new DefaultTableModel(columns, 0) {
@@ -146,6 +146,7 @@ public class ClientFrame extends JFrame {
                 job.getType(),
                 job.getDuration() + " hours",
                 job.getDeadline(),
+                job.getPriority(),
                 job.getStatus()
             });
         }
@@ -174,6 +175,7 @@ class JobSubmissionFrame extends JFrame {
     private JComboBox<String> jobTypeBox;
     private JTextField durationField;
     private JTextField deadlineField;
+    private JComboBox<Integer> priorityBox;
 
     private JButton submitButton;
     private JButton backButton;
@@ -211,6 +213,10 @@ class JobSubmissionFrame extends JFrame {
         };
 
         jobTypeBox = new JComboBox<String>(jobTypes);
+
+        // 1 runs first, 5 runs last
+        Integer[] priorities = {1, 2, 3, 4, 5};
+        priorityBox = new JComboBox<Integer>(priorities);
     }
 
     // Helper method to create buttons.
@@ -240,6 +246,9 @@ class JobSubmissionFrame extends JFrame {
 
         fields.add(new JLabel("Job Deadline (MM/dd/yyyy):"));
         fields.add(deadlineField);
+
+        fields.add(new JLabel("Job Priority (1 = highest):"));
+        fields.add(priorityBox);
 
         JPanel buttons = new JPanel();
         buttons.add(submitButton);
@@ -318,6 +327,7 @@ class JobSubmissionFrame extends JFrame {
         String type = (String) jobTypeBox.getSelectedItem();
         String duration = durationField.getText().trim();
         String deadline = deadlineField.getText().trim();
+        int priority = (Integer) priorityBox.getSelectedItem();
 
         String error = validationError(id, duration, deadline);
         if (error != null) {
@@ -330,7 +340,8 @@ class JobSubmissionFrame extends JFrame {
             id,
             type,
             duration,
-            deadline
+            deadline,
+            priority
         );
 
         if (!submitted) {
@@ -356,6 +367,7 @@ class JobSubmissionFrame extends JFrame {
             + ", Job Type: " + job.getType()
             + ", Job Duration: " + job.getDuration()
             + ", Job Deadline: " + job.getDeadline()
+            + ", Job Priority: " + job.getPriority()
         );
     }
 

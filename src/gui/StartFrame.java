@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import entity.User;
+import entity.VCController;
 import storage.UserStore;
 import storage.VehicleStore;
 import storage.JobStore;
@@ -123,7 +124,8 @@ public class StartFrame extends JFrame {
 
     private void openAdminFrame() {
         if (adminFrame == null || !adminFrame.isDisplayable()) {
-            adminFrame = new AdminFrame(this);
+            // vcc accounts are made as VCController in UserStore
+            adminFrame = new AdminFrame(this, (VCController) currentUser, jobStore);
         }
 
         adminFrame.setVisible(true);
