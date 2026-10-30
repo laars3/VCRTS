@@ -16,6 +16,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import storage.UserStore;
 import entity.User;
+import validation.InputValidator;
 
 public class CreateAccountFrame extends JFrame {
 
@@ -103,6 +104,11 @@ public class CreateAccountFrame extends JFrame {
             }
             if (password.trim().length() == 0) {
                 showError("Enter a password.");
+                return;
+            }
+            String problem = InputValidator.accountError(username, password);
+            if (problem != null) {
+                showError(problem);
                 return;
             }
             if (!password.equals(confirmPassword)) {

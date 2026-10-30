@@ -4,6 +4,8 @@ package gui;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -11,6 +13,7 @@ import entity.Job;
 import entity.User;
 import storage.JobStore;
 import storage.TransactionLog;
+import validation.InputValidator;
 
 public class ClientFrame extends JFrame {
 
@@ -154,6 +157,15 @@ public class ClientFrame extends JFrame {
 // Job submission window.
 class JobSubmissionFrame extends JFrame {
 
+    // Input rules for the job form.
+    private static final int JOB_ID_MIN = 3;
+    private static final int JOB_ID_MAX = 8;
+    private static final String JOB_ID_PATTERN = "[A-Za-z0-9_-]+";
+    private static final String NUMBER_PATTERN = "(0|[1-9][0-9]*)(\\.[0-9]+)?";
+    private static final double DURATION_MAX = 168;
+    private static final DateTimeFormatter DATE_FORMAT =
+        DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
     private final User currentUser;
     private final JobStore jobStore;
     private final ClientFrame clientFrame;
@@ -275,6 +287,39 @@ class JobSubmissionFrame extends JFrame {
         }
     }
 
+    // Returns the first problem found in the form, or null if all is fine.
+    static String validationError(String id, String duration, String deadline) {
+        if (id.length() < JOB_ID_MIN || id.length() > JOB_ID_MAX) {
+            return "Job ID must be " + JOB_ID_MIN + "-" + JOB_ID_MAX
+                + " characters.";
+        }
+
+        if (!id.matches(JOB_ID_PATTERN)) {
+            return "Job ID can only use letters, numbers, - and _.";
+        }
+
+        if (!duration.matches(NUMBER_PATTERN)) {
+            return "Duration must be a plain number like 5 or 2.5.";
+        }
+
+        double hours = Double.parseDouble(duration);
+
+        if (hours <= 0 || hours > DURATION_MAX) {
+            return "Duration must be more than 0 and at most "
+                + (int) DURATION_MAX + " hours.";
+        }
+
+        if (!InputValidator.validDeadline(deadline)) {
+            return "Deadline must be a real date in MM/dd/yyyy format.";
+        }
+
+        if (LocalDate.parse(deadline, DATE_FORMAT).isBefore(LocalDate.now())) {
+            return "Deadline can't be in the past.";
+        }
+
+        return null;
+    }
+
     // Helper method to create and store a Job instance.
     private void submitJob() {
 
@@ -283,6 +328,12 @@ class JobSubmissionFrame extends JFrame {
         String duration = durationField.getText().trim();
         String deadline = deadlineField.getText().trim();
         int priority = (Integer) priorityBox.getSelectedItem();
+
+        String error = validationError(id, duration, deadline);
+        if (error != null) {
+            showError(error);
+            return;
+        }
 
         boolean submitted = jobStore.submitJob(
             currentUser,
