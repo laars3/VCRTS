@@ -3,6 +3,9 @@
 out/
 
 tLog.txt
+users.csv
+vehicles.csv
+jobs.csv
 
 *.iml
 
