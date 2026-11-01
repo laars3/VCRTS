@@ -130,4 +130,35 @@ public class UserStore {
         }
         return false;
     }
+
+    // Resolves both client IDs and legacy username-based job ownership.
+    // Ambiguous identifiers are denied rather than exposing another account's jobs.
+    public boolean ownsJob(User user, String ownerId) {
+        if (!isAuthenticated(user) || !(user instanceof JobOwner)
+                || ownerId == null || ownerId.trim().isEmpty()) {
+            return false;
+        }
+
+        String matchingUsername = null;
+        for (User account : users) {
+            if (!(account instanceof JobOwner)) continue;
+
+            JobOwner owner = (JobOwner) account;
+            boolean matchesClientId = owner.getClientId() != null
+                    && owner.getClientId().equalsIgnoreCase(ownerId.trim());
+            boolean matchesLegacyUsername = owner.getUsername() != null
+                    && owner.getUsername().equalsIgnoreCase(ownerId.trim());
+
+            if (matchesClientId || matchesLegacyUsername) {
+                if (matchingUsername != null
+                        && !matchingUsername.equalsIgnoreCase(owner.getUsername())) {
+                    return false;
+                }
+                matchingUsername = owner.getUsername();
+            }
+        }
+
+        return matchingUsername != null
+                && matchingUsername.equalsIgnoreCase(user.getUsername());
+    }
 }

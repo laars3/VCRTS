@@ -66,7 +66,7 @@ public final class VehicleStore {
         }
     }
 
-    private void saveVehicle(Vehicle v) {
+    private boolean saveVehicle(Vehicle v) {
         try (BufferedWriter out = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
             String line = String.join(
                     ",",
@@ -81,10 +81,10 @@ public final class VehicleStore {
 
             out.write(line);
             out.newLine();
-
-
+            return true;
         } catch (IOException e) {
             System.err.println("Error saving vehicles." + e.getMessage());
+            return false;
         }
     }
 
@@ -119,8 +119,9 @@ public final class VehicleStore {
         vehicle.setVehicleId(id.trim());
         vehicle.setAvailability(true);
 
+        if (!saveVehicle(vehicle)) return false;
+
         vehicles.put(key(id), vehicle);
-        saveVehicle(vehicle);
         return true;
     }
 
@@ -155,6 +156,8 @@ public final class VehicleStore {
         replacement.setScheduleKnown(old.isScheduleKnown());
         replacement.setArrivalTime(old.getArrivalTime());
         replacement.setDepartureTime(old.getDepartureTime());
+
+        if (!saveVehicle(replacement)) return false;
 
         vehicles.put(key(id), replacement);
         return true;
