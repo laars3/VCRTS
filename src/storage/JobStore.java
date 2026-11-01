@@ -2,6 +2,7 @@ package storage;
 
 import entity.User;
 import entity.Job;
+import entity.JobOwner;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -49,9 +50,17 @@ public final class JobStore {
         }
 
         double hours = Double.parseDouble(duration.trim());
-        Job job = new Job(id.trim(), user.getUsername(), type, hours, deadline, priority, "Pending");
+        JobOwner owner = (JobOwner) user;
+        if (!InputValidator.hasText(owner.getClientId())
+                || !users.ownsJob(user, owner.getClientId())) {
+            return false;
+        }
+
+        Job job = new Job(id.trim(), owner.getClientId(), type, hours,
+                deadline, priority, "Pending");
+        if (!saveJob(job)) return false;
+
         jobs.put(key(id), job);
-        saveJob(job);
         return true;
     }
 
@@ -87,7 +96,7 @@ public final class JobStore {
     }
 
     // adds one job to the end of jobs.csv
-    private void saveJob(Job job) {
+    private boolean saveJob(Job job) {
         try (BufferedWriter out = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
             String line = String.join(
                     ",",
@@ -101,8 +110,10 @@ public final class JobStore {
             );
             out.write(line);
             out.newLine();
+            return true;
         } catch (IOException e) {
             System.err.println("Error writing file: " + FILE_NAME + " " + e.getMessage());
+            return false;
         }
     }
 
@@ -116,7 +127,7 @@ public final class JobStore {
         }
 
         Job old = jobs.get(key(id));
-        if (!AccessControl.canModifyJob(user, old)) {
+        if (!canModifyJob(user, old)) {
             return false;
         }
         if (!"Pending".equals(old.getStatus())) {
@@ -126,6 +137,8 @@ public final class JobStore {
         double hours = Double.parseDouble(duration.trim());
         Job updated = new Job(old.getId(), old.getOwnerId(), type, hours, deadline,
                 old.getPriority(), old.getStatus());
+        if (!saveJob(updated)) return false;
+
         jobs.put(key(id), updated);
         return true;
     }
@@ -140,7 +153,7 @@ public final class JobStore {
         }
 
         Job job = jobs.get(key(id));
-        if (!AccessControl.canViewJob(user, job)) {
+        if (!canViewJob(user, job)) {
             return null;
         }
         return job;
@@ -154,7 +167,7 @@ public final class JobStore {
         }
 
         for (Job job : jobs.values()) {
-            if (AccessControl.canViewJob(user, job)) {
+            if (canViewJob(user, job)) {
                 visible.add(job);
             }
         }
@@ -170,5 +183,16 @@ public final class JobStore {
             return new ArrayList<Job>();
         }
         return getVisibleJobs(user);
+    }
+
+    private boolean canModifyJob(User user, Job job) {
+        return AccessControl.canModifyJob(user, job)
+                && users.ownsJob(user, job.getOwnerId());
+    }
+
+    private boolean canViewJob(User user, Job job) {
+        if (job == null) return false;
+        if (AccessControl.canViewAllRecords(user)) return true;
+        return canModifyJob(user, job);
     }
 }

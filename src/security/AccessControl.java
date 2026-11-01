@@ -3,6 +3,7 @@ package security;
 import entity.User;
 import entity.Vehicle;
 import entity.Job;
+import entity.JobOwner;
 
 // Stores check the login too; these methods only check roles and ownership.
 public final class AccessControl {
@@ -11,7 +12,8 @@ public final class AccessControl {
         return user != null && "VEHICLE_OWNER".equals(user.getRole());
     }
     public static boolean canSubmitJob(User user) {
-        return user != null && "JOB_OWNER".equals(user.getRole());
+        return user instanceof JobOwner
+                && "JOB_OWNER".equals(user.getRole());
     }
     public static boolean canViewAllRecords(User user) {
         return user != null && "VCC".equals(user.getRole());
@@ -24,7 +26,13 @@ public final class AccessControl {
         return vehicle != null && (canViewAllRecords(user) || canModifyVehicle(user, vehicle));
     }
     public static boolean canModifyJob(User user, Job job) {
-        return canSubmitJob(user) && job != null && user.getUsername().equals(job.getOwnerId());
+        if (!canSubmitJob(user) || job == null) return false;
+
+        JobOwner owner = (JobOwner) user;
+        String ownerId = job.getOwnerId();
+        return ownerId != null
+                && (ownerId.equalsIgnoreCase(owner.getClientId())
+                || ownerId.equalsIgnoreCase(user.getUsername()));
     }
     public static boolean canViewJob(User user, Job job) {
         return job != null && (canViewAllRecords(user) || canModifyJob(user, job));
