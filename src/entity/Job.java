@@ -19,6 +19,7 @@ public final class Job {
     private String status;
 
     // Job processing information
+    private String result;
     private int redundancyLevel;
     private double completionPercent;
     private LocalDateTime completionTime;
@@ -71,6 +72,9 @@ public final class Job {
     public String getStatus() {
         return status;
     }
+
+    // Returns a job's result
+    public String getResult() { return result; }
 
     // Updates the job status
     public void setStatus(String status) {
