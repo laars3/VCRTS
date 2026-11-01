@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,6 +27,9 @@ public class TransactionLog{
     // Reads every logged line, empty if the file isnt there yet.
     public static ArrayList<String> readAll(){
         ArrayList<String> lines = new ArrayList<String>();
+        if (!new File(FILE_NAME).exists()){
+            return lines;
+        }
         try(BufferedReader in = new BufferedReader(new FileReader(FILE_NAME))){
             String line;
             while ((line = in.readLine()) != null){

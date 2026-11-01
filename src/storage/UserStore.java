@@ -29,6 +29,11 @@ public class UserStore {
     }
 
     private void loadUsers() {
+        // nothing saved yet on a first run, the file is made on the first save
+        if (!new File(FILE_NAME).exists()) {
+            return;
+        }
+
         try (BufferedReader in = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
 
