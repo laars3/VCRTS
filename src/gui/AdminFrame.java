@@ -73,7 +73,7 @@ public class AdminFrame extends JFrame{
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(new RefreshListener());
 
-        computeButton = new JButton("Compute Completion Time");
+        computeButton = new JButton("Get CompletionTime");
         computeButton.addActionListener(new ComputeListener());
 
         // 10/25/2026, Anthony - creates and wire back button
@@ -223,7 +223,7 @@ public class AdminFrame extends JFrame{
         buttonPanel.add(clientViewButton);
         buttonPanel.add(backButton); // 10/25/2026 - anthony - add back button to the panel
 
-        averageLabel = new JLabel("Average waiting time: press Compute Completion Time");
+        averageLabel = new JLabel("Average waiting time: press Get CompletionTime");
         averageLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
         JPanel schedulePanel = new JPanel(new BorderLayout(0, 8));
