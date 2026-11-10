@@ -10,3 +10,5 @@ jobs.csv
 *.iml
 
 .DS_Store
+
+production/
