@@ -9,6 +9,18 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        // todo: open the server socket, accept clients in a loop, one handler thread each
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("VCC server listening on port " + PORT);
+
+            // each client gets its own thread so the loop can go back to waiting
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                ClientHandler handler = new ClientHandler(clientSocket);
+                Thread clientThread = new Thread(handler);
+                clientThread.start();
+            }
+        } catch (IOException e) {
+            System.err.println("Server stopped: " + e.getMessage());
+        }
     }
 }
