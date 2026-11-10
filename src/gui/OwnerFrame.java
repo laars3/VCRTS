@@ -303,34 +303,31 @@ class RegistrationFrame extends JFrame {
 
     // Helper method to create and store the Vehicle instance.
     private void submitRegistration() {
-
         if (!validateFields()) {
             return;
         }
-
         String id = vehicleIdField.getText().trim();
 
+        // TODO (Anthony - Phase 3): Delete the local vehicleStore.registerVehicle() block below once Roni's Client is ready.
+        // TODO (Anthony - Phase 3): Format the vehicle variables into a single string (e.g., "VEHICLE,ownerId,make,model,year,power,residency").
+        // TODO (Anthony - Phase 3): Call network.Client.sendRequestToServer(formattedString).
+        // TODO (Anthony - Phase 3): Read the server's final Accept/Reject response and show a JOptionPane popup.
+
+        /* --- OLD LOCAL LOGIC TO BE REPLACED IN PHASE 3 ---
         boolean registered = vehicleStore.registerVehicle(
-            currentUser,
-            id,
-            manufacturerField.getText().trim(),
-            modelField.getText().trim(),
-            yearField.getText().trim(),
-            powerField.getText().trim(),
-            residencyField.getText().trim()
+                currentUser, id, manufacturerField.getText().trim(),
+                modelField.getText().trim(), yearField.getText().trim(),
+                powerField.getText().trim(), residencyField.getText().trim()
         );
 
         if (!registered) {
-            showError(
-                "Invalid vehicle information or duplicate Vehicle ID."
-            );
+            showError("Invalid vehicle information or duplicate Vehicle ID.");
             return;
         }
-
         Vehicle vehicle = vehicleStore.getVehicle(currentUser, id);
-
         saveTransaction(vehicle);
         ownerFrame.refreshTable();
+        -------------------------------------------------**/
 
         dispose();
     }

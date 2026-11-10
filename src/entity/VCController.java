@@ -11,7 +11,6 @@ public class VCController extends User{
     private final List<Job> activeJobs = new ArrayList<>();
     private final List<Job> completedJobs = new ArrayList<>();
     private final List<Vehicle> vehicles = new ArrayList<>();
-    private Server server;
 
 // Constructor
     public VCController(String controllerId,String username, String password) {
@@ -38,11 +37,6 @@ public class VCController extends User{
 // Returns vehicles managed by the controller.
     public List<Vehicle> getVehicles() {
         return Collections.unmodifiableList(vehicles);
-    }
-
-// assigns the server.
-    public void setServer(Server server){
-    this.server = server;
     }
 
  // Registers a vehicle

@@ -76,9 +76,30 @@ public class AdminFrame extends JFrame{
         computeButton = new JButton("Get CompletionTime");
         computeButton.addActionListener(new ComputeListener());
 
-        // 10/25/2026, Anthony - creates and wire back button
+        // milestone 2 feedback - Anthony - creates and wire back button
         backButton = new JButton("Back");
         backButton.addActionListener(new BackListener());
+
+        // TODO (Niyo - Phase 2): Create the "Accept" and "Reject" JButtons here.
+        // TODO (Niyo - Phase 2): Add these two buttons to the 'buttonPanel' inside the createPanel() method below.
+        // TODO (Niyo - Phase 2): Wire them to the AcceptRequestListener and RejectRequestListener.
+    }
+
+    // TODO (Ryan - Phase 2): Implement the Accept listener for Niyo's button
+    class AcceptRequestListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            // 1. Get the selected row from the incoming requests table.
+            // 2. Extract the data and route it to jobStore.submitJob() or vehicleStore.registerVehicle().
+            // 3. Trigger the Server to send the "Accepted" notification back to the Client.
+        }
+    }
+
+    // TODO (Ryan - Phase 2): Implement the Reject listener for Niyo's button
+    class RejectRequestListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            // 1. Discard the selected request so it doesn't save to the CSV.
+            // 2. Trigger the Server to send the "Rejected" notification back to the Client.
+        }
     }
 
     class OwnerViewListener implements ActionListener{

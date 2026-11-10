@@ -322,7 +322,6 @@ class JobSubmissionFrame extends JFrame {
 
     // Helper method to create and store a Job instance.
     private void submitJob() {
-
         String id = jobIdField.getText().trim();
         String type = (String) jobTypeBox.getSelectedItem();
         String duration = durationField.getText().trim();
@@ -335,26 +334,29 @@ class JobSubmissionFrame extends JFrame {
             return;
         }
 
+        // TODO (Anthony - Phase 3): Delete the local jobStore.submitJob() block below once Roni's Client is ready.
+        // TODO (Anthony - Phase 3): Format the job variables above into a single CSV string (e.g., "JOB,clientId,jobId,type,duration,deadline,priority").
+        // TODO (Anthony - Phase 3): Call network.Client.sendRequestToServer(formattedString).
+        // TODO (Anthony - Phase 3): Read the final "Accepted" or "Rejected" response from the server and show a JOptionPane popup.
+
+        /* --- OLD LOCAL LOGIC TO BE REPLACED IN PHASE 3 ---
         boolean submitted = jobStore.submitJob(
-            currentUser,
-            id,
-            type,
-            duration,
-            deadline,
-            priority
-        );
+        currentUser,
+        id,
+        type,
+        duration,
+        deadline,
+        priority);
 
         if (!submitted) {
-            showError(
-                "Invalid job information or duplicate Job ID."
-            );
+            showError("Invalid job information or duplicate Job ID.");
             return;
         }
 
         Job job = jobStore.getJob(currentUser, id);
-
         saveTransaction(job);
         clientFrame.refreshTable();
+        -------------------------------------------------**/
 
         dispose();
     }
