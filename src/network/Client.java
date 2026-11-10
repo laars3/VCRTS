@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class Client {
     private static final String HOST = "localhost";
-    private static final int PORT = 8080;
+    private static final int PORT = 9806;
 
     public static void sendRequestToServer(String data) {
         try (
