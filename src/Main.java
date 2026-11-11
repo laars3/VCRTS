@@ -1,5 +1,6 @@
 import gui.*;
 import javax.swing.JFrame;
+import network.Server;
 import storage.UserStore;
 import storage.VehicleStore;
 import storage.JobStore;
@@ -10,6 +11,9 @@ public class Main{
         UserStore userStore = new UserStore();
         VehicleStore vehicleStore = new VehicleStore(userStore);
         JobStore jobStore = new JobStore(userStore);
+
+        // server waits for clients in the background so the gui doesn't freeze
+        new Thread(new Server()).start();
 
         JFrame login = new StartFrame(userStore, vehicleStore, jobStore);
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
