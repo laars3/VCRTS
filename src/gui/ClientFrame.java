@@ -335,28 +335,33 @@ class JobSubmissionFrame extends JFrame {
         }
 
         // TODO (Anthony - Phase 3): Delete the local jobStore.submitJob() block below once Roni's Client is ready.
-        // TODO (Anthony - Phase 3): Format the job variables above into a single CSV string (e.g., "JOB,clientId,jobId,type,duration,deadline,priority").
-        // TODO (Anthony - Phase 3): Call network.Client.sendRequestToServer(formattedString).
-        // TODO (Anthony - Phase 3): Read the final "Accepted" or "Rejected" response from the server and show a JOptionPane popup.
 
-        /* --- OLD LOCAL LOGIC TO BE REPLACED IN PHASE 3 ---
-        boolean submitted = jobStore.submitJob(
-        currentUser,
-        id,
-        type,
-        duration,
-        deadline,
-        priority);
+        // 1. Format the job variables above into a single CSV string (e.g., "JOB,clientId,jobId,type,duration,deadline,priority") for the network
+        String requestData = String.join(",",
+                "JOB",
+                currentUser.getUsername(),
+                id,
+                type,
+                duration,
+                deadline,
+                String.valueOf(priority)
+        );
 
-        if (!submitted) {
-            showError("Invalid job information or duplicate Job ID.");
-            return;
+        // 2. Calls network.Client.sendRequestToServer(formattedString) to send to the Server via Roni's Socket Client & wait for the response
+        String serverResponse = network.Client.sendRequestToServer(requestData);
+
+        // 3. Read the final "Accepted" or "Rejected" response from the server and show a JOptionPane popup.
+        if (serverResponse != null && serverResponse.contains("Accepted")) {
+            JOptionPane.showMessageDialog(this,
+                    "Boom. VCC Controller Approved:\n" + serverResponse,
+                    "Job Accepted",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+                    // note: now that the server handles saving to the CSV, we don't have to call TransactionLog here anymore
+                    clientFrame.refreshTable();
+        } else {
+            showError("WHOMP-WHOMP. VCC Controller rejected your request:\n" + serverResponse);
         }
-
-        Job job = jobStore.getJob(currentUser, id);
-        saveTransaction(job);
-        clientFrame.refreshTable();
-        -------------------------------------------------**/
 
         dispose();
     }
