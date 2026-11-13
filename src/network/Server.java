@@ -10,7 +10,7 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("VCC server listening on port " + PORT);
+            System.out.println("Server listening on port " + PORT);
 
             // each client gets its own thread so the loop can go back to waiting
             while (true) {
