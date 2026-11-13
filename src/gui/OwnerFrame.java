@@ -309,26 +309,34 @@ class RegistrationFrame extends JFrame {
         String id = vehicleIdField.getText().trim();
 
         // TODO (Anthony - Phase 3): Delete the local vehicleStore.registerVehicle() block below once Roni's Client is ready.
-        // TODO (Anthony - Phase 3): Format the vehicle variables into a single string (e.g., "VEHICLE,ownerId,make,model,year,power,residency").
-        // TODO (Anthony - Phase 3): Call network.Client.sendRequestToServer(formattedString).
-        // TODO (Anthony - Phase 3): Read the server's final Accept/Reject response and show a JOptionPane popup.
 
-        /* --- OLD LOCAL LOGIC TO BE REPLACED IN PHASE 3 ---
-        boolean registered = vehicleStore.registerVehicle(
-                currentUser, id, manufacturerField.getText().trim(),
-                modelField.getText().trim(), yearField.getText().trim(),
-                powerField.getText().trim(), residencyField.getText().trim()
+        // 1. Formats the vehicle variables into a single CSV string for the network (e.g., "VEHICLE,ownerId,make,model,year,power,residency").
+        String requestData = String.join(",",
+                "VEHICLE",
+                currentUser.getUsername(),
+                id,
+                manufacturerField.getText().trim(),
+                modelField.getText().trim(),
+                yearField.getText().trim(),
+                powerField.getText().trim(),
+                residencyField.getText().trim()
         );
 
-        if (!registered) {
-            showError("Invalid vehicle information or duplicate Vehicle ID.");
-            return;
-        }
-        Vehicle vehicle = vehicleStore.getVehicle(currentUser, id);
-        saveTransaction(vehicle);
-        ownerFrame.refreshTable();
-        -------------------------------------------------**/
+        // 2. Calls network.Client.sendRequestToServer(formattedString) to send to the Server via Roni's Socket Client & wait for the response
+        String serverResponse = network.Client.sendRequestToServer(requestData);
 
+        // 3. Reads the server's final Accept/Reject response and shows a popup notification to the Vehicle Owner.
+        if (serverResponse != null && serverResponse.contains("Accepted")) {
+            JOptionPane.showMessageDialog(this,
+                    "Boom. VCC Controller Approved:\n" + serverResponse,
+                    "WOO-HOO! Vehicle approved!",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+                    // refresh the GUI table
+                    ownerFrame.refreshTable();
+        } else {
+            showError("WHOMP-WHOMP. VCC Controller rejected your request:\n" + serverResponse);
+        }
         dispose();
     }
 

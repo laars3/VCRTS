@@ -29,6 +29,10 @@ public class AdminFrame extends JFrame{
     private JButton refreshButton;
     private JButton computeButton;
     private JButton backButton; // 10/25/2026 - anthony - Declares a back button variable
+    private JButton acceptButton;
+    private JButton rejectButton;
+    private DefaultTableModel requestTableModel;
+    private JTable requestTable;
 
     private DefaultTableModel jobTableModel;
     private DefaultTableModel vehicleTableModel;
@@ -83,6 +87,11 @@ public class AdminFrame extends JFrame{
         // TODO (Niyo - Phase 2): Create the "Accept" and "Reject" JButtons here.
         // TODO (Niyo - Phase 2): Add these two buttons to the 'buttonPanel' inside the createPanel() method below.
         // TODO (Niyo - Phase 2): Wire them to the AcceptRequestListener and RejectRequestListener.
+
+        acceptButton = new JButton("Accept");
+        acceptButton.addActionListener(new AcceptRequestListener());
+        rejectButton = new JButton("Reject");
+        rejectButton.addActionListener(new RejectRequestListener());
     }
 
     // TODO (Ryan - Phase 2): Implement the Accept listener for Niyo's button
@@ -177,6 +186,11 @@ public class AdminFrame extends JFrame{
                 return false;
             }
         };
+
+        requestTableModel = new DefaultTableModel(new String[]{"Type", "Sender ID", "Request ID", "Details"}, 0){
+            public boolean isCellEditable(int row, int column){ return false; }
+        };
+
     }
 
     // Rebuilds both tables from the transaction log.
@@ -244,6 +258,12 @@ public class AdminFrame extends JFrame{
         buttonPanel.add(clientViewButton);
         buttonPanel.add(backButton); // 10/25/2026 - anthony - add back button to the panel
 
+        requestTable = new JTable(requestTableModel);
+        requestTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        buttonPanel.add(acceptButton);
+        buttonPanel.add(rejectButton);
+
+
         averageLabel = new JLabel("Average waiting time: press Get CompletionTime");
         averageLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
@@ -255,6 +275,8 @@ public class AdminFrame extends JFrame{
         tabs.addTab("Client Jobs", createTableScroll(jobTableModel));
         tabs.addTab("Owner Vehicles", createTableScroll(vehicleTableModel));
         tabs.addTab("Schedule", schedulePanel);
+        tabs.addTab("Pending Requests", new JScrollPane(requestTable));
+
 
         JPanel mainPanel = new JPanel(new BorderLayout(0, 12));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
