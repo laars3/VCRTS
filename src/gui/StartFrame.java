@@ -121,7 +121,8 @@ public class StartFrame extends JFrame {
     private void openAdminFrame() {
         if (adminFrame == null || !adminFrame.isDisplayable()) {
             // vcc accounts are made as VCController in UserStore
-            adminFrame = new AdminFrame(this, (VCController) currentUser, jobStore, server);
+            adminFrame = new AdminFrame(this, (VCController) currentUser,
+                    userStore, vehicleStore, jobStore, server);
         }
 
         adminFrame.setVisible(true);

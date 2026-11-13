@@ -14,6 +14,8 @@ import entity.VCController;
 import network.Server;
 import storage.JobStore;
 import storage.TransactionLog;
+import storage.UserStore;
+import storage.VehicleStore;
 
 // Portal for VCC admins, shows every client job and owner vehicle and opens both views.
 public class AdminFrame extends JFrame{
@@ -45,14 +47,20 @@ public class AdminFrame extends JFrame{
     private final StartFrame startFrame;
     private final VCController vcc;
     private final JobStore jobStore;
+    // accept looks up who sent the request and saves through these
+    private final UserStore userStore;
+    private final VehicleStore vehicleStore;
     // holds the requests waiting for accept or reject
     private final Server server;
 
-    public AdminFrame(StartFrame startFrame, VCController vcc, JobStore jobStore, Server server){
+    public AdminFrame(StartFrame startFrame, VCController vcc, UserStore userStore,
+            VehicleStore vehicleStore, JobStore jobStore, Server server){
 
         super("VCC Admin");
         this.startFrame = startFrame;
         this.vcc = vcc;
+        this.userStore = userStore;
+        this.vehicleStore = vehicleStore;
         this.jobStore = jobStore;
         this.server = server;
         createButtons();
@@ -81,7 +89,7 @@ public class AdminFrame extends JFrame{
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(new RefreshListener());
 
-        computeButton = new JButton("Get CompletionTime");
+        computeButton = new JButton("Schedule Jobs");
         computeButton.addActionListener(new ComputeListener());
 
         // milestone 2 feedback - Anthony - creates and wire back button
@@ -272,7 +280,7 @@ public class AdminFrame extends JFrame{
         JPanel jobsPanel = createTab(createTableScroll(jobTableModel), clientViewButton);
         JPanel vehiclesPanel = createTab(createTableScroll(vehicleTableModel), ownerViewButton);
 
-        averageLabel = new JLabel("Average waiting time: press Get CompletionTime");
+        averageLabel = new JLabel("Average waiting time: press Schedule Jobs");
         averageLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
         JPanel schedulePanel = createTab(createTableScroll(scheduleTableModel), computeButton);
