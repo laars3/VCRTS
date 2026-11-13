@@ -13,7 +13,9 @@ public class Main{
         JobStore jobStore = new JobStore(userStore);
 
         // server waits for clients in the background so the gui doesn't freeze
-        new Thread(new Server()).start();
+        // kept in a variable so the admin frame can reach the pending requests later
+        Server server = new Server();
+        new Thread(server).start();
 
         JFrame login = new StartFrame(userStore, vehicleStore, jobStore);
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
