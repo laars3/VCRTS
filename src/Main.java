@@ -1,5 +1,6 @@
 import gui.*;
 import javax.swing.JFrame;
+import network.Server;
 import storage.UserStore;
 import storage.VehicleStore;
 import storage.JobStore;
@@ -11,8 +12,19 @@ public class Main{
         VehicleStore vehicleStore = new VehicleStore(userStore);
         JobStore jobStore = new JobStore(userStore);
 
-        JFrame login = new StartFrame(userStore, vehicleStore, jobStore);
+        // server waits for clients in the background so the gui doesn't freeze
+        Server server = new Server();
+        new Thread(server).start();
+
+        // the admin frame gets the server through here to accept or reject requests
+        JFrame login = new StartFrame(userStore, vehicleStore, jobStore, server);
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         login.setVisible(true);
+
+        // second login so a client and the vcc can be logged in at the same time
+        JFrame login2 = new StartFrame(userStore, vehicleStore, jobStore, server);
+        login2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        login2.setLocation(login.getX() + 40, login.getY() + 40);
+        login2.setVisible(true);
     }
 }

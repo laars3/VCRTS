@@ -113,6 +113,18 @@ public class UserStore {
         return false;
     }
 
+    // the server only gets a username, this finds the account it belongs to
+    public User findUser(String username) {
+        if (username == null) return null;
+
+        for (User user : users) {
+            if (user.getUsername().equalsIgnoreCase(username.trim())) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public User authenticate(String username, String password) {
         if (username == null || password == null) return null;
 

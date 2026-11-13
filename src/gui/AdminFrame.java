@@ -11,8 +11,11 @@ import java.util.List;
 
 import entity.Job;
 import entity.VCController;
+import network.Server;
 import storage.JobStore;
 import storage.TransactionLog;
+import storage.UserStore;
+import storage.VehicleStore;
 
 // Portal for VCC admins, shows every client job and owner vehicle and opens both views.
 public class AdminFrame extends JFrame{
@@ -44,13 +47,22 @@ public class AdminFrame extends JFrame{
     private final StartFrame startFrame;
     private final VCController vcc;
     private final JobStore jobStore;
+    // accept looks up who sent the request and saves through these
+    private final UserStore userStore;
+    private final VehicleStore vehicleStore;
+    // holds the requests waiting for accept or reject
+    private final Server server;
 
-    public AdminFrame(StartFrame startFrame, VCController vcc, JobStore jobStore){
+    public AdminFrame(StartFrame startFrame, VCController vcc, UserStore userStore,
+            VehicleStore vehicleStore, JobStore jobStore, Server server){
 
         super("VCC Admin");
         this.startFrame = startFrame;
         this.vcc = vcc;
+        this.userStore = userStore;
+        this.vehicleStore = vehicleStore;
         this.jobStore = jobStore;
+        this.server = server;
         createButtons();
         createTables();
         createPanel();
@@ -77,16 +89,12 @@ public class AdminFrame extends JFrame{
         refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(new RefreshListener());
 
-        computeButton = new JButton("Get CompletionTime");
+        computeButton = new JButton("Schedule Jobs");
         computeButton.addActionListener(new ComputeListener());
 
         // milestone 2 feedback - Anthony - creates and wire back button
         backButton = new JButton("Back");
         backButton.addActionListener(new BackListener());
-
-        // TODO (Niyo - Phase 2): Create the "Accept" and "Reject" JButtons here.
-        // TODO (Niyo - Phase 2): Add these two buttons to the 'buttonPanel' inside the createPanel() method below.
-        // TODO (Niyo - Phase 2): Wire them to the AcceptRequestListener and RejectRequestListener.
 
         acceptButton = new JButton("Accept");
         acceptButton.addActionListener(new AcceptRequestListener());
@@ -239,6 +247,19 @@ public class AdminFrame extends JFrame{
         return new JScrollPane(table);
     }
 
+    // table in the middle, the tab's own buttons underneath
+    private JPanel createTab(JComponent table, JButton... buttons){
+        JPanel tabButtons = new JPanel();
+        for (JButton button : buttons){
+            tabButtons.add(button);
+        }
+
+        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.add(table, BorderLayout.CENTER);
+        panel.add(tabButtons, BorderLayout.SOUTH);
+        return panel;
+    }
+
     private void createPanel(){
         JLabel title = new JLabel("VCC Admin Portal");
         title.setFont(new Font("Arial", Font.BOLD, 20));
@@ -250,33 +271,30 @@ public class AdminFrame extends JFrame{
         introPanel.add(title, BorderLayout.NORTH);
         introPanel.add(intro, BorderLayout.CENTER);
 
-        // button under table
+        // refresh and back work on every tab, so they stay under the tabs
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(refreshButton);
-        buttonPanel.add(computeButton);
-        buttonPanel.add(ownerViewButton);
-        buttonPanel.add(clientViewButton);
         buttonPanel.add(backButton); // 10/25/2026 - anthony - add back button to the panel
+
+        // each tab only shows the buttons that belong to it
+        JPanel jobsPanel = createTab(createTableScroll(jobTableModel), clientViewButton);
+        JPanel vehiclesPanel = createTab(createTableScroll(vehicleTableModel), ownerViewButton);
+
+        averageLabel = new JLabel("Average waiting time: press Schedule Jobs");
+        averageLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
+        JPanel schedulePanel = createTab(createTableScroll(scheduleTableModel), computeButton);
+        schedulePanel.add(averageLabel, BorderLayout.NORTH);
 
         requestTable = new JTable(requestTableModel);
         requestTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        buttonPanel.add(acceptButton);
-        buttonPanel.add(rejectButton);
-
-
-        averageLabel = new JLabel("Average waiting time: press Get CompletionTime");
-        averageLabel.setFont(new Font("Arial", Font.BOLD, 14));
-
-        JPanel schedulePanel = new JPanel(new BorderLayout(0, 8));
-        schedulePanel.add(createTableScroll(scheduleTableModel), BorderLayout.CENTER);
-        schedulePanel.add(averageLabel, BorderLayout.SOUTH);
+        JPanel requestsPanel = createTab(new JScrollPane(requestTable), acceptButton, rejectButton);
 
         tabs = new JTabbedPane();
-        tabs.addTab("Client Jobs", createTableScroll(jobTableModel));
-        tabs.addTab("Owner Vehicles", createTableScroll(vehicleTableModel));
+        tabs.addTab("Client Jobs", jobsPanel);
+        tabs.addTab("Owner Vehicles", vehiclesPanel);
         tabs.addTab("Schedule", schedulePanel);
-        tabs.addTab("Pending Requests", new JScrollPane(requestTable));
-
+        tabs.addTab("Pending Requests", requestsPanel);
 
         JPanel mainPanel = new JPanel(new BorderLayout(0, 12));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
