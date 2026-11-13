@@ -214,8 +214,8 @@ class JobSubmissionFrame extends JFrame {
 
         jobTypeBox = new JComboBox<String>(jobTypes);
 
-        // 1 runs first, 5 runs last
-        Integer[] priorities = {1, 2, 3, 4, 5};
+        // 1 runs first, 10 runs last
+        Integer[] priorities = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         priorityBox = new JComboBox<Integer>(priorities);
     }
 

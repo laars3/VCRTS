@@ -11,6 +11,7 @@ import java.util.List;
 
 import entity.Job;
 import entity.VCController;
+import network.Server;
 import storage.JobStore;
 import storage.TransactionLog;
 
@@ -44,13 +45,16 @@ public class AdminFrame extends JFrame{
     private final StartFrame startFrame;
     private final VCController vcc;
     private final JobStore jobStore;
+    // holds the requests waiting for accept or reject
+    private final Server server;
 
-    public AdminFrame(StartFrame startFrame, VCController vcc, JobStore jobStore){
+    public AdminFrame(StartFrame startFrame, VCController vcc, JobStore jobStore, Server server){
 
         super("VCC Admin");
         this.startFrame = startFrame;
         this.vcc = vcc;
         this.jobStore = jobStore;
+        this.server = server;
         createButtons();
         createTables();
         createPanel();

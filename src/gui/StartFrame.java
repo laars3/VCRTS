@@ -7,6 +7,7 @@ import javax.swing.*;
 
 import entity.User;
 import entity.VCController;
+import network.Server;
 import storage.UserStore;
 import storage.VehicleStore;
 import storage.JobStore;
@@ -25,23 +26,18 @@ public class StartFrame extends JFrame {
     private final UserStore userStore;
     private final VehicleStore vehicleStore;
     private final JobStore jobStore;
+    private final Server server;
     private User currentUser;
 
-    // Compatibility constructor for existing callers.
-    public StartFrame(UserStore userStore) {
-        this(userStore,
-                new VehicleStore(userStore),
-                new JobStore(userStore));
-    }
-
     public StartFrame(UserStore userStore,
-            VehicleStore vehicleStore, JobStore jobStore) {
+            VehicleStore vehicleStore, JobStore jobStore, Server server) {
 
         super("Log In");
 
         this.userStore = userStore;
         this.vehicleStore = vehicleStore;
         this.jobStore = jobStore;
+        this.server = server;
 
         createTextFields();
         loginButton();
@@ -125,7 +121,7 @@ public class StartFrame extends JFrame {
     private void openAdminFrame() {
         if (adminFrame == null || !adminFrame.isDisplayable()) {
             // vcc accounts are made as VCController in UserStore
-            adminFrame = new AdminFrame(this, (VCController) currentUser, jobStore);
+            adminFrame = new AdminFrame(this, (VCController) currentUser, jobStore, server);
         }
 
         adminFrame.setVisible(true);

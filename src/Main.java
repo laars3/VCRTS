@@ -13,11 +13,11 @@ public class Main{
         JobStore jobStore = new JobStore(userStore);
 
         // server waits for clients in the background so the gui doesn't freeze
-        // kept in a variable so the admin frame can reach the pending requests later
         Server server = new Server();
         new Thread(server).start();
 
-        JFrame login = new StartFrame(userStore, vehicleStore, jobStore);
+        // the admin frame gets the server through here to accept or reject requests
+        JFrame login = new StartFrame(userStore, vehicleStore, jobStore, server);
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         login.setVisible(true);
     }
