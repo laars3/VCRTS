@@ -20,5 +20,11 @@ public class Main{
         JFrame login = new StartFrame(userStore, vehicleStore, jobStore, server);
         login.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         login.setVisible(true);
+
+        // second login so a client and the vcc can be logged in at the same time
+        JFrame login2 = new StartFrame(userStore, vehicleStore, jobStore, server);
+        login2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        login2.setLocation(login.getX() + 40, login.getY() + 40);
+        login2.setVisible(true);
     }
 }
