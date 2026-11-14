@@ -9,8 +9,11 @@ import javax.swing.table.DefaultTableModel;
 
 import entity.User;
 import entity.Vehicle;
-import storage.VehicleStore;
 import storage.TransactionLog;
+import storage.VehicleStore;
+
+// ADDED: Validates computation power before sending the request.
+import validation.InputValidator;
 
 public class OwnerFrame extends JFrame {
 
@@ -24,6 +27,7 @@ public class OwnerFrame extends JFrame {
 
     // Constructor only initializes and calls helper methods.
     public OwnerFrame(User user, VehicleStore store) {
+
         super("Owner View");
 
         currentUser = user;
@@ -38,12 +42,14 @@ public class OwnerFrame extends JFrame {
 
     // Helper method to create the vehicle table.
     private void createTable() {
+
         String[] columns = {
             "Vehicle ID", "Manufacturer", "Model",
             "Year", "Computation Power", "Residency"
         };
 
         tableModel = new DefaultTableModel(columns, 0) {
+
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -52,30 +58,36 @@ public class OwnerFrame extends JFrame {
 
     // Helper method to create buttons.
     private void createButtons() {
+
         registrationButton = new JButton("Register Vehicle");
+
         registrationButton.addActionListener(
-            new AddRegistrationListener()
-        );
+                new AddRegistrationListener());
 
         backButton = new JButton("Back");
+
         backButton.addActionListener(new BackListener());
     }
 
     // Helper method to build the GUI.
     private void createPanel() {
+
         JLabel title = new JLabel("Available Vehicles");
+
         title.setFont(new Font("Arial", Font.BOLD, 18));
 
         JLabel intro = new JLabel(
-            "Vehicles registered with the vehicular cloud."
-        );
+                "Vehicles registered with the vehicular cloud.");
 
         JPanel header = new JPanel(new GridLayout(2, 1));
+
         header.add(title);
         header.add(intro);
 
         JTable table = new JTable(tableModel);
+
         table.setFillsViewportHeight(true);
+
         table.getTableHeader().setReorderingAllowed(false);
 
         JPanel buttonPanel = new JPanel();
@@ -89,11 +101,13 @@ public class OwnerFrame extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
 
         mainPanel.setBorder(
-            BorderFactory.createEmptyBorder(16, 20, 16, 20)
-        );
+                BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
         mainPanel.add(header, BorderLayout.NORTH);
-        mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        mainPanel.add(
+                new JScrollPane(table), BorderLayout.CENTER);
+
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
@@ -101,18 +115,19 @@ public class OwnerFrame extends JFrame {
 
     // Helper method to configure the window.
     private void setupFrame() {
+
         setSize(1280, 720);
         setLocationRelativeTo(null);
     }
 
     // Helper method to open vehicle registration.
     private void openRegistrationFrame() {
+
         if (registrationFrame == null
                 || !registrationFrame.isDisplayable()) {
 
             registrationFrame = new RegistrationFrame(
-                currentUser, vehicleStore, this
-            );
+                    currentUser, vehicleStore, this);
         }
 
         registrationFrame.setVisible(true);
@@ -121,6 +136,7 @@ public class OwnerFrame extends JFrame {
 
     // Regular listener for registering a vehicle.
     class AddRegistrationListener implements ActionListener {
+
         public void actionPerformed(ActionEvent event) {
             openRegistrationFrame();
         }
@@ -128,6 +144,7 @@ public class OwnerFrame extends JFrame {
 
     // Regular listener for the back button.
     class BackListener implements ActionListener {
+
         public void actionPerformed(ActionEvent event) {
             setVisible(false);
         }
@@ -135,6 +152,7 @@ public class OwnerFrame extends JFrame {
 
     // Helper method to display stored Vehicle instances.
     public void refreshTable() {
+
         tableModel.setRowCount(0);
 
         for (Vehicle vehicle :
@@ -187,6 +205,7 @@ class RegistrationFrame extends JFrame {
 
     // Helper method for text fields.
     private void createTextFields() {
+
         vehicleIdField = new JTextField(20);
         manufacturerField = new JTextField(20);
         modelField = new JTextField(20);
@@ -197,15 +216,19 @@ class RegistrationFrame extends JFrame {
 
     // Helper method for buttons.
     private void createButtons() {
+
         submitButton = new JButton("Submit");
+
         submitButton.addActionListener(new SubmitListener());
 
         backButton = new JButton("Back");
+
         backButton.addActionListener(new BackListener());
     }
 
     // Helper method for GUI layout.
     private void createPanel() {
+
         JPanel fields = new JPanel(new GridLayout(0, 2, 5, 5));
 
         fields.add(new JLabel("Vehicle ID:"));
@@ -227,14 +250,14 @@ class RegistrationFrame extends JFrame {
         fields.add(residencyField);
 
         JPanel buttons = new JPanel();
+
         buttons.add(submitButton);
         buttons.add(backButton);
 
         JPanel main = new JPanel(new BorderLayout(10, 10));
 
         main.setBorder(
-            BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        );
+                BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         main.add(fields, BorderLayout.CENTER);
         main.add(buttons, BorderLayout.SOUTH);
@@ -244,13 +267,17 @@ class RegistrationFrame extends JFrame {
 
     // Helper method to configure the window.
     private void setupFrame() {
+
         pack();
+
         setLocationRelativeTo(ownerFrame);
+
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     // Regular submit listener.
     class SubmitListener implements ActionListener {
+
         public void actionPerformed(ActionEvent event) {
             submitRegistration();
         }
@@ -258,6 +285,7 @@ class RegistrationFrame extends JFrame {
 
     // Regular back listener.
     class BackListener implements ActionListener {
+
         public void actionPerformed(ActionEvent event) {
             dispose();
         }
@@ -265,36 +293,60 @@ class RegistrationFrame extends JFrame {
 
     // Helper method to validate registration inputs.
     private boolean validateFields() {
+
         String id = vehicleIdField.getText().trim();
         String make = manufacturerField.getText().trim();
         String model = modelField.getText().trim();
 
         if (!id.matches("[A-Za-z0-9_-]{3,8}")) {
+
             showError("Vehicle ID must be 3-8 characters.");
+
             return false;
         }
 
         if (!make.matches("[A-Za-z0-9 .-]{2,30}")
                 || !model.matches("[A-Za-z0-9 .-]{2,30}")) {
-            showError("Manufacturer and model must be 2-30 characters.");
+
+            showError(
+                    "Manufacturer and model must be 2-30 characters.");
+
             return false;
         }
 
         try {
-            int year = Integer.parseInt(yearField.getText().trim());
+
+            int year = Integer.parseInt(
+                    yearField.getText().trim());
+
             int residency = Integer.parseInt(
-                residencyField.getText().trim()
-            );
+                    residencyField.getText().trim());
 
             if (year < 1900
                     || year > java.time.Year.now().getValue() + 1
-                    || residency < 1 || residency > 168) {
+                    || residency < 1
+                    || residency > 168) {
 
                 showError("Invalid year or residency.");
+
                 return false;
             }
-        } catch (NumberFormatException e) {
-            showError("Year and residency must be whole numbers.");
+
+        } catch (NumberFormatException error) {
+
+            showError(
+                    "Year and residency must be whole numbers.");
+
+            return false;
+        }
+
+        // ADDED: Require positive computation power.
+        if (!InputValidator.positiveNumber(
+                powerField.getText().trim())) {
+
+            showError(
+                    "Computation power must be a positive number.");
+
             return false;
         }
 
@@ -302,19 +354,22 @@ class RegistrationFrame extends JFrame {
     }
 
     // Helper method to create and store the Vehicle instance.
+    // UPDATED: Send the network request on a separate thread so the GUI remains responsive.
     private void submitRegistration() {
+
         if (!validateFields()) {
             return;
         }
-        String id = vehicleIdField.getText().trim();
 
         // TODO (Anthony - Phase 3): Delete the local vehicleStore.registerVehicle() block below once Roni's Client is ready.
+        // UPDATED: The local save has already been moved to admin approval.
 
         // 1. Formats the vehicle variables into a single CSV string for the network (e.g., "VEHICLE,ownerId,make,model,year,power,residency").
-        String requestData = String.join(",",
+        // The actual protocol also includes a vehicle ID after the username.
+        final String requestData = String.join(",",
                 "VEHICLE",
                 currentUser.getUsername(),
-                id,
+                vehicleIdField.getText().trim(),
                 manufacturerField.getText().trim(),
                 modelField.getText().trim(),
                 yearField.getText().trim(),
@@ -322,26 +377,94 @@ class RegistrationFrame extends JFrame {
                 residencyField.getText().trim()
         );
 
-        // 2. Calls network.Client.sendRequestToServer(formattedString) to send to the Server via Roni's Socket Client & wait for the response
-        String serverResponse = network.Client.sendRequestToServer(requestData);
+        // ADDED: Prevent duplicate submissions while waiting for approval.
+        setWaiting(true);
 
-        // 3. Reads the server's final Accept/Reject response and shows a popup notification to the Vehicle Owner.
-        if (serverResponse != null && serverResponse.contains("Accepted")) {
-            JOptionPane.showMessageDialog(this,
-                    "Boom. VCC Controller Approved:\n" + serverResponse,
-                    "WOO-HOO! Vehicle approved!",
+        // ADDED: Wait for the server on a background worker.
+        SwingWorker<String, Void> worker =
+                new SwingWorker<String, Void>() {
+
+            @Override
+            protected String doInBackground() {
+
+                // 2. Calls network.Client.sendRequestToServer(formattedString) to send to the Server via Roni's Socket Client & wait for the response
+                // Network communication runs off the Swing event thread.
+                return network.Client.sendRequestToServer(
+                        requestData);
+            }
+
+            @Override
+            protected void done() {
+
+                // Update the GUI safely after receiving the final decision.
+                setWaiting(false);
+
+                try {
+
+                    showDecision(get());
+
+                } catch (Exception error) {
+
+                    showError(
+                            "Could not receive the server response: "
+                            + error.getMessage());
+                }
+            }
+        };
+
+        // Starts the background worker.
+        worker.execute();
+    }
+
+    // ADDED: Controls the form while awaiting a decision.
+    private void setWaiting(boolean waiting) {
+
+        submitButton.setEnabled(!waiting);
+
+        backButton.setEnabled(!waiting);
+
+        submitButton.setText(
+                waiting ? "Waiting for Admin..." : "Submit");
+
+        setDefaultCloseOperation(
+                waiting ? JFrame.DO_NOTHING_ON_CLOSE
+                        : JFrame.DISPOSE_ON_CLOSE);
+    }
+
+    // 3. Reads the server's final Accept/Reject response and shows a popup notification to the Vehicle Owner.
+    // ADDED: Shows the final decision and refreshes accepted records.
+    private void showDecision(String response) {
+
+        if ("Accepted".equals(response)) {
+
+            // refresh the GUI table
+            ownerFrame.refreshTable();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Vehicle registration accepted!",
+                    "Approved",
                     JOptionPane.INFORMATION_MESSAGE);
 
-                    // refresh the GUI table
-                    ownerFrame.refreshTable();
+            dispose();
+
+        } else if ("Rejected".equals(response)) {
+
+            showError(
+                    "The admin rejected this vehicle registration.");
+
         } else {
-            showError("WHOMP-WHOMP. VCC Controller rejected your request:\n" + serverResponse);
+
+            showError(
+                    "No final admin decision received. Server response: "
+                    + response);
         }
-        dispose();
     }
 
     // Helper method to record a successful registration.
+    // Retained for reference; approved registrations are now logged in AdminFrame.
     private void saveTransaction(Vehicle vehicle) {
+
         TransactionLog.append(
             "Owner: " + currentUser.getUsername()
             + ", Vehicle ID: " + vehicle.getVehicleId()
@@ -356,9 +479,11 @@ class RegistrationFrame extends JFrame {
 
     // Helper method for error messages.
     private void showError(String message) {
+
         JOptionPane.showMessageDialog(
-            this, message, "Invalid Vehicle",
-            JOptionPane.ERROR_MESSAGE
-        );
+                this,
+                message,
+                "Invalid Vehicle",
+                JOptionPane.ERROR_MESSAGE);
     }
 }
