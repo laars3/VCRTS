@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-// ADDED: Supports a list of server requests.
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
@@ -15,12 +14,10 @@ import javax.swing.table.DefaultTableModel;
 
 import entity.Job;
 
-// ADDED: Identifies the owner of a submitted request.
 import entity.JobOwner;
 import entity.User;
 import entity.VCController;
 
-// ADDED: Represents incoming server requests.
 import network.ClientHandler;
 import network.Server;
 import storage.JobStore;
@@ -66,7 +63,7 @@ public class AdminFrame extends JFrame {
     private JLabel averageLabel;
     private JTabbedPane tabs;
 
-    // ADDED: Automatically refreshes the pending requests table.
+    // checks the server for new requests
     private Timer pendingRefreshTimer;
 
     // start frame keeps the owner and client frames, so admin sees the same ones users do
@@ -81,7 +78,7 @@ public class AdminFrame extends JFrame {
     // holds the requests waiting for accept or reject
     private final Server server;
 
-    // ADDED: Holds the exact request objects shown in the pending requests table.
+    // same order as the rows in the pending table
     private List<ClientHandler> displayedRequests =
             new ArrayList<ClientHandler>();
 
@@ -103,7 +100,6 @@ public class AdminFrame extends JFrame {
         createPanel();
         loadLog();
 
-        // UPDATED: Sets up automatic refresh and window handling.
         setupFrame();
     }
 
@@ -131,32 +127,23 @@ public class AdminFrame extends JFrame {
         rejectButton.addActionListener(new RejectRequestListener());
     }
 
-    // TODO (Ryan - Phase 2): Implement the Accept listener for Niyo's button
-    // ADDED: Implements the original TODO using a shared decision method.
     class AcceptRequestListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
 
-            // 1. Get the selected row from the incoming requests table.
-            // 2. Extract the data and route it to jobStore.submitJob() or vehicleStore.registerVehicle().
-            // 3. Trigger the Server to send the "Accepted" notification back to the Client.
             handleRequestDecision(true);
         }
     }
 
-    // TODO (Ryan - Phase 2): Implement the Reject listener for Niyo's button
-    // ADDED: Implements the original TODO without saving rejected requests.
     class RejectRequestListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
 
-            // 1. Discard the selected request so it doesn't save to the CSV.
-            // 2. Trigger the Server to send the "Rejected" notification back to the Client.
             handleRequestDecision(false);
         }
     }
 
-    // ADDED: Gets the request, saves it if accepted, and notifies the client.
+    // saves the selected request if accepted, then tells the client
     private void handleRequestDecision(boolean accepting) {
 
         ClientHandler request = getSelectedRequest();
@@ -178,7 +165,7 @@ public class AdminFrame extends JFrame {
 
         if (accepting) {
 
-            // Save the request before notifying the client.
+            // save first so the client is never told accepted for something that wasn't saved
             boolean saved = saveAcceptedRequest(request);
 
             if (saved) {
@@ -187,14 +174,12 @@ public class AdminFrame extends JFrame {
 
             } else {
 
-                // Never send Accepted when validation or CSV saving fails.
                 server.reject(request);
                 status = "Rejected - Invalid request or unable to save";
             }
 
         } else {
 
-            // Reject without writing to either CSV file.
             server.reject(request);
             status = "Rejected";
         }
@@ -205,7 +190,7 @@ public class AdminFrame extends JFrame {
                 this, "Request " + request.getId() + ": " + status);
     }
 
-    // ADDED: Matches the selected row to the original server request.
+    // the request behind the selected row, null if nothing is selected
     private ClientHandler getSelectedRequest() {
 
         int selectedRow = requestTable.getSelectedRow();
@@ -232,7 +217,7 @@ public class AdminFrame extends JFrame {
         return displayedRequests.get(modelRow);
     }
 
-    // ADDED: Routes accepted requests to the correct existing store.
+    // sends the request to the job or vehicle store
     private boolean saveAcceptedRequest(ClientHandler request) {
 
         if (request == null || request.getLine() == null) {
@@ -254,7 +239,7 @@ public class AdminFrame extends JFrame {
 
         User user = userStore.findUser(username);
 
-        // Existing stores require a signed-in owner, not the admin account.
+        // the stores only save for an owner who is logged in
         if (user == null || !userStore.isAuthenticated(user)) {
             return false;
         }
@@ -279,7 +264,6 @@ public class AdminFrame extends JFrame {
         return false;
     }
 
-    // ADDED: VehicleStore validates the request and writes vehicles.csv.
     private boolean saveVehicleRequest(User user, String[] data) {
 
         // VEHICLE,username,id,make,model,year,power,residency
@@ -313,7 +297,6 @@ public class AdminFrame extends JFrame {
         return saved;
     }
 
-    // ADDED: JobStore validates the request and writes jobs.csv.
     private boolean saveJobRequest(User user, String[] data) {
 
         // JOB,username,id,type,duration,deadline,priority
@@ -358,12 +341,11 @@ public class AdminFrame extends JFrame {
         return saved;
     }
 
-    // ADDED: Displays all requests currently pending on the server.
     private void refreshPendingRequests() {
 
         List<ClientHandler> latest = server.getPending();
 
-        // Avoid clearing the selected row every time the timer runs.
+        // only rebuild when something changed, so the selected row isn't lost every tick
         if (latest.equals(displayedRequests)) {
             return;
         }
@@ -383,7 +365,7 @@ public class AdminFrame extends JFrame {
         }
     }
 
-    // ADDED: Builds readable details from request fields after the ID.
+    // everything after the id, for the details column
     private String getRequestDetails(ClientHandler request) {
 
         String[] fields = request.getLine().split(",", -1);
@@ -539,7 +521,6 @@ public class AdminFrame extends JFrame {
             }
         }
 
-        // ADDED: Refreshes the pending request table along with saved records.
         refreshPendingRequests();
     }
 
@@ -674,7 +655,7 @@ public class AdminFrame extends JFrame {
         add(mainPanel);
     }
 
-    // ADDED: Checks for incoming server requests while the pending tab is open.
+    // only polls while the pending tab is open
     class PendingRefreshListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
@@ -685,7 +666,6 @@ public class AdminFrame extends JFrame {
         }
     }
 
-    // UPDATED: Starts the refresh timer and configures window behavior.
     private void setupFrame() {
 
         pendingRefreshTimer = new Timer(

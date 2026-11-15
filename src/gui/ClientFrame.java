@@ -12,7 +12,6 @@ import javax.swing.table.DefaultTableModel;
 import entity.Job;
 import entity.User;
 import storage.JobStore;
-import storage.TransactionLog;
 import validation.InputValidator;
 
 public class ClientFrame extends JFrame {
@@ -348,7 +347,7 @@ class JobSubmissionFrame extends JFrame {
             return "Duration must be a plain number like 5 or 2.5.";
         }
 
-        // UPDATED: Handle invalid duration values without crashing.
+        // a duration too big to parse still shouldn't crash the form
         double hours;
 
         try {
@@ -382,8 +381,7 @@ class JobSubmissionFrame extends JFrame {
         return null;
     }
 
-    // Helper method to create and store a Job instance.
-    // UPDATED: Send the job request on a separate thread so the GUI remains responsive.
+    // Sends the job to the VCC server and waits for its decision in the background.
     private void submitJob() {
 
         final String id = jobIdField.getText().trim();
@@ -409,10 +407,7 @@ class JobSubmissionFrame extends JFrame {
             return;
         }
 
-        // TODO (Anthony - Phase 3): Delete the local jobStore.submitJob() block below once Roni's Client is ready.
-        // UPDATED: The local save has already been moved to admin approval.
-
-        // 1. Format the job variables above into a single CSV string (e.g., "JOB,clientId,jobId,type,duration,deadline,priority") for the network
+        // JOB,username,jobId,type,duration,deadline,priority
         final String requestData = String.join(",",
                 "JOB",
                 currentUser.getUsername(),
@@ -423,18 +418,16 @@ class JobSubmissionFrame extends JFrame {
                 String.valueOf(priority)
         );
 
-        // ADDED: Prevent duplicate submissions while waiting for approval.
+        // no second submit while this one is waiting
         setWaiting(true);
 
-        // ADDED: Wait for the server on a background worker.
+        // waiting on the gui thread would freeze every window, including the admin's
         SwingWorker<String, Void> worker =
                 new SwingWorker<String, Void>() {
 
             @Override
             protected String doInBackground() {
 
-                // 2. Calls network.Client.sendRequestToServer(formattedString) to send to the Server via Roni's Socket Client & wait for the response
-                // Network communication runs off the Swing event thread.
                 return network.Client.sendRequestToServer(
                         requestData);
             }
@@ -442,7 +435,7 @@ class JobSubmissionFrame extends JFrame {
             @Override
             protected void done() {
 
-                // Update the GUI safely after receiving the final decision.
+                // back on the gui thread here
                 setWaiting(false);
 
                 try {
@@ -458,11 +451,10 @@ class JobSubmissionFrame extends JFrame {
             }
         };
 
-        // Starts the background worker.
         worker.execute();
     }
 
-    // ADDED: Controls the form while awaiting a decision.
+    // Locks the form while waiting for a decision.
     private void setWaiting(boolean waiting) {
 
         submitButton.setEnabled(!waiting);
@@ -477,13 +469,11 @@ class JobSubmissionFrame extends JFrame {
                         : JFrame.DISPOSE_ON_CLOSE);
     }
 
-    // 3. Read the final "Accepted" or "Rejected" response from the server and show a JOptionPane popup.
-    // ADDED: Shows the final decision and refreshes accepted records.
+    // Shows the VCC's decision, accepted jobs are already saved by the admin.
     private void showDecision(String response) {
 
         if ("Accepted".equals(response)) {
 
-            // note: now that the server handles saving to the CSV, we don't have to call TransactionLog here anymore
             clientFrame.refreshTable();
 
             JOptionPane.showMessageDialog(
@@ -504,20 +494,6 @@ class JobSubmissionFrame extends JFrame {
                     "No final admin decision received. Server response: "
                     + response);
         }
-    }
-
-    // Helper method to record successful job submission.
-    // Retained for reference; approved jobs are now logged in AdminFrame.
-    private void saveTransaction(Job job) {
-
-        TransactionLog.append(
-            "Client: " + job.getOwnerId()
-            + ", Job ID: " + job.getId()
-            + ", Job Type: " + job.getType()
-            + ", Job Duration: " + job.getDuration()
-            + ", Job Deadline: " + job.getDeadline()
-            + ", Job Priority: " + job.getPriority()
-        );
     }
 
     // Helper method to display errors.

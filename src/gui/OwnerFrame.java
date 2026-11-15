@@ -9,10 +9,7 @@ import javax.swing.table.DefaultTableModel;
 
 import entity.User;
 import entity.Vehicle;
-import storage.TransactionLog;
 import storage.VehicleStore;
-
-// ADDED: Validates computation power before sending the request.
 import validation.InputValidator;
 
 public class OwnerFrame extends JFrame {
@@ -340,7 +337,6 @@ class RegistrationFrame extends JFrame {
             return false;
         }
 
-        // ADDED: Require positive computation power.
         if (!InputValidator.positiveNumber(
                 powerField.getText().trim())) {
 
@@ -353,19 +349,14 @@ class RegistrationFrame extends JFrame {
         return true;
     }
 
-    // Helper method to create and store the Vehicle instance.
-    // UPDATED: Send the network request on a separate thread so the GUI remains responsive.
+    // Sends the vehicle to the VCC server and waits for its decision in the background.
     private void submitRegistration() {
 
         if (!validateFields()) {
             return;
         }
 
-        // TODO (Anthony - Phase 3): Delete the local vehicleStore.registerVehicle() block below once Roni's Client is ready.
-        // UPDATED: The local save has already been moved to admin approval.
-
-        // 1. Formats the vehicle variables into a single CSV string for the network (e.g., "VEHICLE,ownerId,make,model,year,power,residency").
-        // The actual protocol also includes a vehicle ID after the username.
+        // VEHICLE,username,vehicleId,make,model,year,power,residency
         final String requestData = String.join(",",
                 "VEHICLE",
                 currentUser.getUsername(),
@@ -377,18 +368,16 @@ class RegistrationFrame extends JFrame {
                 residencyField.getText().trim()
         );
 
-        // ADDED: Prevent duplicate submissions while waiting for approval.
+        // no second submit while this one is waiting
         setWaiting(true);
 
-        // ADDED: Wait for the server on a background worker.
+        // waiting on the gui thread would freeze every window, including the admin's
         SwingWorker<String, Void> worker =
                 new SwingWorker<String, Void>() {
 
             @Override
             protected String doInBackground() {
 
-                // 2. Calls network.Client.sendRequestToServer(formattedString) to send to the Server via Roni's Socket Client & wait for the response
-                // Network communication runs off the Swing event thread.
                 return network.Client.sendRequestToServer(
                         requestData);
             }
@@ -396,7 +385,7 @@ class RegistrationFrame extends JFrame {
             @Override
             protected void done() {
 
-                // Update the GUI safely after receiving the final decision.
+                // back on the gui thread here
                 setWaiting(false);
 
                 try {
@@ -412,11 +401,10 @@ class RegistrationFrame extends JFrame {
             }
         };
 
-        // Starts the background worker.
         worker.execute();
     }
 
-    // ADDED: Controls the form while awaiting a decision.
+    // Locks the form while waiting for a decision.
     private void setWaiting(boolean waiting) {
 
         submitButton.setEnabled(!waiting);
@@ -431,13 +419,11 @@ class RegistrationFrame extends JFrame {
                         : JFrame.DISPOSE_ON_CLOSE);
     }
 
-    // 3. Reads the server's final Accept/Reject response and shows a popup notification to the Vehicle Owner.
-    // ADDED: Shows the final decision and refreshes accepted records.
+    // Shows the VCC's decision, accepted vehicles are already saved by the admin.
     private void showDecision(String response) {
 
         if ("Accepted".equals(response)) {
 
-            // refresh the GUI table
             ownerFrame.refreshTable();
 
             JOptionPane.showMessageDialog(
@@ -459,22 +445,6 @@ class RegistrationFrame extends JFrame {
                     "No final admin decision received. Server response: "
                     + response);
         }
-    }
-
-    // Helper method to record a successful registration.
-    // Retained for reference; approved registrations are now logged in AdminFrame.
-    private void saveTransaction(Vehicle vehicle) {
-
-        TransactionLog.append(
-            "Owner: " + currentUser.getUsername()
-            + ", Vehicle ID: " + vehicle.getVehicleId()
-            + ", Vehicle Manufacturer: " + vehicle.getMake()
-            + ", Vehicle Model: " + vehicle.getModel()
-            + ", Vehicle Year: " + vehicle.getYear()
-            + ", Vehicle Computation Power: "
-            + vehicle.getComputationPower()
-            + ", Vehicle Residency: " + vehicle.getResidency()
-        );
     }
 
     // Helper method for error messages.
