@@ -22,7 +22,7 @@ public class ClientHandler implements Runnable {
             DataInputStream inputStream = new DataInputStream(clientSocket.getInputStream());
             outputStream = new DataOutputStream(clientSocket.getOutputStream());
 
-            // one message per request, e.g. JOB,client1,P-1,...
+            // one message per request
             line = inputStream.readUTF();
             System.out.println("Received: " + line);
 
