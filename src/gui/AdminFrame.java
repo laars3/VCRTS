@@ -66,9 +66,13 @@ public class AdminFrame extends JFrame {
     // checks the server for new requests
     private Timer pendingRefreshTimer;
 
-    // start frame keeps the owner and client frames, so admin sees the same ones users do
+    // back goes to the login window
     private final StartFrame startFrame;
     private final VCController vcc;
+
+    // the admin's own read-only views
+    private OwnerFrame ownerFrame;
+    private ClientFrame clientFrame;
 
     // accept looks up who sent the request and saves through these
     private final UserStore userStore;
@@ -387,14 +391,26 @@ public class AdminFrame extends JFrame {
     class OwnerViewListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
-            startFrame.openOwnerFrame();
+            if (ownerFrame == null || !ownerFrame.isDisplayable()) {
+                ownerFrame = new OwnerFrame(vcc, vehicleStore);
+            }
+
+            ownerFrame.refreshTable();
+            ownerFrame.setVisible(true);
+            ownerFrame.toFront();
         }
     }
 
     class ClientViewListener implements ActionListener {
 
         public void actionPerformed(ActionEvent event) {
-            startFrame.openClientFrame();
+            if (clientFrame == null || !clientFrame.isDisplayable()) {
+                clientFrame = new ClientFrame(vcc, jobStore);
+            }
+
+            clientFrame.refreshTable();
+            clientFrame.setVisible(true);
+            clientFrame.toFront();
         }
     }
 

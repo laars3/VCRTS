@@ -18,16 +18,12 @@ public class StartFrame extends JFrame {
     private JButton loginButton;
     private JButton createAccountButton;
 
-    private OwnerFrame ownerFrame;
-    private ClientFrame clientFrame;
-    private AdminFrame adminFrame;
     private CreateAccountFrame createAccountFrame;
 
     private final UserStore userStore;
     private final VehicleStore vehicleStore;
     private final JobStore jobStore;
     private final Server server;
-    private User currentUser;
 
     public StartFrame(UserStore userStore,
             VehicleStore vehicleStore, JobStore jobStore, Server server) {
@@ -72,61 +68,29 @@ public class StartFrame extends JFrame {
                 return;
             }
 
+            usernameField.setText("");
             passwordField.setText("");
 
-            // Close old dashboards from the previous login.
-            if (ownerFrame != null) ownerFrame.dispose();
-            if (clientFrame != null) clientFrame.dispose();
-            if (adminFrame != null) adminFrame.dispose();
-
-            ownerFrame = null;
-            clientFrame = null;
-            adminFrame = null;
-
-            currentUser = user;
+            // every login gets its own window, so a client and the vcc can be open together
+            JFrame frame;
 
             if ("VEHICLE_OWNER".equals(user.getRole())) {
-                openOwnerFrame();
+                frame = new OwnerFrame(user, vehicleStore);
             } else if ("JOB_OWNER".equals(user.getRole())) {
-                openClientFrame();
+                frame = new ClientFrame(user, jobStore);
             } else if ("VCC".equals(user.getRole())) {
-                openAdminFrame();
+                // vcc accounts are made as VCController in UserStore
+                frame = new AdminFrame(StartFrame.this, (VCController) user,
+                        userStore, vehicleStore, jobStore, server);
             } else {
                 JOptionPane.showMessageDialog(
                         StartFrame.this,
                         "No view for this account yet");
+                return;
             }
+
+            frame.setVisible(true);
         }
-    }
-
-    // AdminFrame also uses these methods for read-only views.
-    void openOwnerFrame() {
-        if (ownerFrame == null || !ownerFrame.isDisplayable()) {
-            ownerFrame = new OwnerFrame(currentUser, vehicleStore);
-        }
-
-        ownerFrame.setVisible(true);
-        ownerFrame.toFront();
-    }
-
-    void openClientFrame() {
-        if (clientFrame == null || !clientFrame.isDisplayable()) {
-            clientFrame = new ClientFrame(currentUser, jobStore);
-        }
-
-        clientFrame.setVisible(true);
-        clientFrame.toFront();
-    }
-
-    private void openAdminFrame() {
-        if (adminFrame == null || !adminFrame.isDisplayable()) {
-            // vcc accounts are made as VCController in UserStore
-            adminFrame = new AdminFrame(this, (VCController) currentUser,
-                    userStore, vehicleStore, jobStore, server);
-        }
-
-        adminFrame.setVisible(true);
-        adminFrame.toFront();
     }
 
     private void createAccountButton() {
